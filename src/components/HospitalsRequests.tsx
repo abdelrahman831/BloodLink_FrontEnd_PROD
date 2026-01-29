@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { useAPI, useMutation } from '../hooks/useAPI';
 import { apiCall, hospitalsAPI } from '../services/api';
+import { format } from 'path/win32';
 
 type Hospital = {
   id: number;
@@ -164,12 +165,18 @@ export function HospitalsRequests() {
               {console.log(bloodTypeMap[1])}
               
                 <TableCell>{r.centerName}</TableCell>
-                <TableCell>{r.date}</TableCell>
+                <TableCell>{format(
+      addDays(new Date(r.date), 56),
+      "dd/MM/yyyy"
+    )
+  : "N/A";
+  }
+                </TableCell>
                 <TableCell>{bloodTypeMap[parseInt(r.bloodType)]}</TableCell>
                 <TableCell>{r.userName || '—'}</TableCell>
                 <TableCell>{r.phone}</TableCell>
                 <TableCell>{statusBadge(r.status)}</TableCell>
-                <TableCell className="text-right space-x-2">
+                <TableCell className="text-right space-x-5">
                   <Button
                     size="sm"
                     onClick={() => hospitalsAPI.approveRequest(r.id,r.hospitalId) && refetch }
