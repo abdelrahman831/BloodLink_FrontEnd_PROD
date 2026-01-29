@@ -45,7 +45,7 @@ export function BloodInventory() {
 
       {error && (
         <Card className="p-4 border border-red-200 bg-red-50">
-          <p className="text-sm text-red-700">Errore API: {error.message}</p>
+          <p className="text-sm text-red-700">Errore API: {error}</p>
         </Card>
       )}
 
