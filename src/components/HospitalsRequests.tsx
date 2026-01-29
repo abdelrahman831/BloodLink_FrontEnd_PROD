@@ -165,13 +165,7 @@ export function HospitalsRequests() {
               {console.log(bloodTypeMap[1])}
               
                 <TableCell>{r.centerName}</TableCell>
-                <TableCell>{format(
-      addDays(new Date(r.date), 56),
-      "dd/MM/yyyy"
-    )
-  : "N/A";
-  }
-                </TableCell>
+                <TableCell>{format(new Date(r.date),"dd/MM/yyyy")}</TableCell>
                 <TableCell>{bloodTypeMap[parseInt(r.bloodType)]}</TableCell>
                 <TableCell>{r.userName || '—'}</TableCell>
                 <TableCell>{r.phone}</TableCell>
