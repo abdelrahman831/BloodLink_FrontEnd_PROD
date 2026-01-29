@@ -78,11 +78,11 @@ export function HospitalsRequests() {
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Building2 className="w-6 h-6 text-purple-600" />
-          <span>Hospitals & Requests</span>
+          <span>Donation Requests</span>
         </h1>
-        <p className="text-gray-600 mt-1">Richieste ospedaliere (dati da API)</p>
+        <p className="text-gray-600 mt-1">Donation requests from hospitals (data from API)</p>
       </div>
-
+{/* 
       <Card className="p-4">
         <div className="flex flex-wrap gap-3 items-center justify-between">
           <div className="flex flex-wrap gap-3 items-center">
@@ -106,15 +106,13 @@ export function HospitalsRequests() {
             </label>
           </div>
 
-          <Button variant="outline" onClick={refetch}>
-            Refresh
-          </Button>
+
         </div>
-      </Card>
+      </Card> */}
 
       {error && (
         <Card className="p-4 border border-red-200 bg-red-50">
-          <p className="text-sm text-red-700">Errore API: {error.message}</p>
+          <p className="text-sm text-red-700">Api Error: {error.message}</p>
         </Card>
       )}
 
@@ -125,8 +123,9 @@ export function HospitalsRequests() {
             Requests
           </h3>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <AlertTriangle className="w-4 h-4" />
-            {onlyUrgent ? 'Filtro: urgent' : 'Tutte'}
+                      <Button variant="outline" onClick={refetch}>
+            Refresh
+          </Button>
           </div>
         </div>
 
@@ -138,7 +137,6 @@ export function HospitalsRequests() {
               <TableHead>Blood Type</TableHead>
               <TableHead>UserName</TableHead>
               <TableHead>Phone</TableHead>
-              <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -170,12 +168,11 @@ export function HospitalsRequests() {
                 <TableCell>{bloodTypeMap[parseInt(r.bloodType)]}</TableCell>
                 <TableCell>{r.userName || '—'}</TableCell>
                 <TableCell>{r.phone}</TableCell>
-                <TableCell>{r.priority || '—'}</TableCell>
                 <TableCell>{statusBadge(r.status)}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button
                     size="sm"
-                    onClick={() => hospitalsAPI.approveRequest(r.id,r.hospitalId)}
+                    onClick={() => hospitalsAPI.approveRequest(r.id,r.hospitalId) && refetch }
                     disabled={approve.loading}
                   >
                     Approve
@@ -183,7 +180,7 @@ export function HospitalsRequests() {
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={hospitalsAPI.rejectRequest(r.id,r.hospitalId)}
+                    onClick={hospitalsAPI.rejectRequest(r.id,r.hospitalId) && refetch }
                     disabled={reject.loading}
                   >
                     Reject
