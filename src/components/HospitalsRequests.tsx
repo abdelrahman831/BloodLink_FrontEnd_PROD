@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { useAPI, useMutation } from '../hooks/useAPI';
 import { apiCall, hospitalsAPI } from '../services/api';
-import { format } from 'path/win32';
+import { format } from 'date-fns';
 
 type Hospital = {
   id: number;
