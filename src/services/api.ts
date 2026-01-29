@@ -49,7 +49,7 @@ export async function apiCall<T>(
   });
 
   const data = await parseResponse(res);
-
+  console.log(data);
   localStorage.setItem('hospitalId', data.hospitalId);
 
 
