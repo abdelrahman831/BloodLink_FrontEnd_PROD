@@ -55,7 +55,6 @@ export function HospitalsRequests() {
 
   const approve = useMutation((id: any, hospitalId: any) => hospitalsAPI.approveRequest(id, hospitalId));
   const reject = useMutation((id: any, hospitalId: any) => hospitalsAPI.rejectRequest(id, hospitalId));
-
   const onApprove = async (id: any, hospitalId: any) => {
     await approve.mutate(id, hospitalId);
     refetch();

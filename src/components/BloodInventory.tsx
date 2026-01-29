@@ -24,7 +24,7 @@ function statusBadge(status?: string) {
 }
 
 export function BloodInventory() {
-  const { data, loading, error } = useAPI<InventoryItem[]>(() => inventoryAPI.getAll(), []);
+  const { data, loading, error } = useAPI<InventoryItem[]>(() => inventoryAPI.getAll(localStorage.getItem('hospitalId')), []);
 
   const totalUnits = (data || []).reduce((sum, item) => sum + (item.unitsAvailable || 0), 0);
   const totalExpiring = (data || []).reduce((sum, item) => sum + (item.expiringSoon || 0), 0);

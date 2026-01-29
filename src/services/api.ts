@@ -50,6 +50,9 @@ export async function apiCall<T>(
 
   const data = await parseResponse(res);
 
+  localStorage.setItem('hospitalId', data.hospitalId);
+
+
   if (!res.ok) {
     // Prova a leggere un "message" se arriva JSON
     const message =
@@ -87,7 +90,7 @@ export const dashboardAPI = {
 
 // Blood Inventory APIs
 export const inventoryAPI = {
-  getAll: () => apiCall('/inventory'),
+  getAll: (id: any) => apiCall(`/BloodUnits/${id}`),
   getByType: (bloodType: string) => apiCall(`/inventory/${bloodType}`),
   update: (bloodType: string, data: any) => 
     apiCall(`/inventory/${bloodType}`, {
