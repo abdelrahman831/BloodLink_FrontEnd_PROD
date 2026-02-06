@@ -53,6 +53,8 @@ export function BloodInventory() {
           setError("hospitalId mancante in localStorage. Salvalo dopo il login (localStorage.setItem('hospitalId', ...)).");
           return;
         }
+  console.log('BloodInventory hospitalId from localStorage:', hospitalId);
+
 
         const res = await inventoryAPI.getAll(hospitalId);
         const arr = normalizeInventory(res);
@@ -98,12 +100,12 @@ export function BloodInventory() {
           <Droplet className="w-6 h-6 text-blue-500" />
           <span>Blood Inventory</span>
         </h1>
-        <p className="text-gray-600 mt-1">Tabella inventario (dati da API)</p>
+        <p className="text-gray-600 mt-1">Data fetched from API</p>
       </div>
 
       {error && (
         <Card className="p-4 border border-red-200 bg-red-50">
-          <p className="text-sm text-red-700">Errore API: {error}</p>
+          <p className="text-sm text-red-700">Api Error: {error}</p>
         </Card>
       )}
 
