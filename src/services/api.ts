@@ -49,15 +49,12 @@ export async function apiCall<T>(
   });
 
   const data = await parseResponse(res);
-  console.log(data);
-  localStorage.setItem('hospitalId', data.hospitalId);
-
-
+  
+  
   if (!res.ok) {
     // Prova a leggere un "message" se arriva JSON
     const message =
       (data as any)?.message ||
-      (data as any)?.error ||
       (data as any)?.raw ||
       `Errore HTTP ${res.status}`;
 
@@ -90,6 +87,9 @@ export const dashboardAPI = {
 
 // Blood Inventory APIs
 export const inventoryAPI = {
+  // Ottieni l'inventario per un ospedale specifico
+  getHospitalId: () => localStorage.getItem('hospitalId'),
+
   getAll: (id: any) => apiCall(`/BloodUnits/${id}`),
   getByType: (bloodType: string) => apiCall(`/BloodUnits/${bloodType}`),
   update: (bloodType: string, data: any) => 
@@ -107,7 +107,7 @@ export const hospitalsAPI = {
     return apiCall(`/Appointments/Hospital${queryParams}`);
   },
   approveRequest: (id: any, hospitalId: any) => 
-    apiCall(`/Appointments/${id}/approve`, {
+    apiCall(`/Appointments/${id}/accept`, {
       method: 'POST', body: JSON.stringify({ hospitalId ,id}),
     }),
   rejectRequest: (id : any, hospitalId: any) => 

@@ -1,12 +1,13 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from './ui/card';
 import { Droplet, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Progress } from './ui/progress';
-import { useAPI } from '../hooks/useAPI';
 import { inventoryAPI } from '../services/api';
 
 type InventoryItem = {
+  HospitalId?: string;
   bloodType: string;
   unitsAvailable: number;
   expiringSoon: number;
@@ -23,15 +24,72 @@ function statusBadge(status?: string) {
   return <Badge variant="outline">—</Badge>;
 }
 
+// Normalizza la risposta: supporta array oppure { items: [...] }
+function normalizeInventory(data: any): InventoryItem[] {
+  if (Array.isArray(data)) return data as InventoryItem[];
+  if (data && Array.isArray(data.items)) return data.items as InventoryItem[];
+  return [];
+}
+
 export function BloodInventory() {
-  const { data, loading, error } = useAPI<InventoryItem[]>(() => inventoryAPI.getAll(localStorage.getItem('hospitalId')), []);
-  console.log(localStorage.getItem('hospitalId'));
-  const totalUnits = (data || []).reduce((sum, item) => sum + (item.unitsAvailable || 0), 0);
-  const totalExpiring = (data || []).reduce((sum, item) => sum + (item.expiringSoon || 0), 0);
-  const criticalTypes = (data || []).filter((item) => {
-    const s = (item.status || '').toLowerCase();
-    return s === 'critical' || s === 'low';
-  }).length;
+  const [data, setData] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  // se non lo hai, non chiamare l’API a vuoto
+  const hospitalId = useMemo(() => localStorage.getItem('hospitalId') || '', []);
+
+  console.log('BloodInventory hospitalId from localStorage:', hospitalId);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError('');
+
+      try {
+        if (!hospitalId) {
+          setData([]);
+          setError("hospitalId mancante in localStorage. Salvalo dopo il login (localStorage.setItem('hospitalId', ...)).");
+          return;
+        }
+
+        const res = await inventoryAPI.getAll(hospitalId);
+        const arr = normalizeInventory(res);
+
+        if (!cancelled) setData(arr);
+      } catch (e: any) {
+        if (!cancelled) {
+          setError(e?.message || String(e));
+          setData([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [hospitalId]);
+
+  const totalUnits = useMemo(
+    () => (data || []).reduce((sum, item) => sum + (Number(item.unitsAvailable) || 0), 0),
+    [data]
+  );
+
+  const totalExpiring = useMemo(
+    () => (data || []).reduce((sum, item) => sum + (Number(item.expiringSoon) || 0), 0),
+    [data]
+  );
+
+  const criticalTypes = useMemo(() => {
+    return (data || []).filter((item) => {
+      const s = (item.status || '').toLowerCase();
+      return s === 'critical' || s === 'low';
+    }).length;
+  }, [data]);
 
   return (
     <div className="space-y-6">
@@ -109,12 +167,12 @@ export function BloodInventory() {
                     <TableCell>{item.expiringSoon}</TableCell>
                     <TableCell>{item.averageDemand ?? '—'}</TableCell>
                     <TableCell>{statusBadge(item.status)}</TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[160px]">
                       <div className="flex items-center gap-3">
-                        <div className="w-28">
-                          <Progress value={item.fillPercentage ?? 0} />
-                        </div>
-                        <span className="text-sm text-gray-600">{item.fillPercentage ?? 0}%</span>
+                        <Progress value={item.fillPercentage ?? 0} />
+                        <span className="text-xs text-gray-600 w-10 text-right">
+                          {Math.round(item.fillPercentage ?? 0)}%
+                        </span>
                       </div>
                     </TableCell>
                   </TableRow>

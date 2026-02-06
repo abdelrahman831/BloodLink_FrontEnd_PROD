@@ -23,6 +23,9 @@ export function LoginPage() {
       const token = res?.token;
       if (!token) throw new Error('Login riuscito ma token mancante nella risposta.');
       localStorage.setItem('auth_token', token);
+      localStorage.setItem('hospitalId',(res as any).hospitalId ||'');
+      console.log('Login riuscito, token salvato in localStorage.');
+      console.log('Hospital ID:', localStorage.getItem('hospitalId'));
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

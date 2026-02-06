@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Card } from './ui/card';
-import { Building2, Clock, AlertTriangle } from 'lucide-react';
+import { Building2, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { useAPI, useMutation } from '../hooks/useAPI';
 import { apiCall, hospitalsAPI } from '../services/api';
 import { format } from 'date-fns';
-
+import { Check, X } from "lucide-react";
 type Hospital = {
   id: number;
   name: string;
@@ -55,16 +55,17 @@ export function HospitalsRequests() {
 
   const approve = useMutation((id: any, hospitalId: any) => hospitalsAPI.approveRequest(id, hospitalId));
   const reject = useMutation((id: any, hospitalId: any) => hospitalsAPI.rejectRequest(id, hospitalId));
-  const onApprove = async (id: any, hospitalId: any) => {
-    await approve.mutate(id, hospitalId);
-    refetch();
-  };
+const onApprove = async (id: any, hospitalId: any) => {
+  await approve.mutate(id, hospitalId);
+  await refetch();
+};
 
-  const onReject = async (id: any, hospitalId: any) => {
-    await reject.mutate(id, hospitalId);
-    refetch();
-  };
+const onReject = async (id: any, hospitalId: any) => {
+  await reject.mutate(id, hospitalId);
+  await refetch();
+};
 
+const [pendingAction, setPendingAction] = useState<{ id: number; type: "approve" | "reject" } | null>(null);
 
 
   
@@ -169,23 +170,54 @@ export function HospitalsRequests() {
                 <TableCell>{r.userName || '—'}</TableCell>
                 <TableCell>{r.phone}</TableCell>
                 <TableCell>{statusBadge(r.status)}</TableCell>
-                <TableCell className="text-right space-x-5">
-                  <Button
-                    size="sm"
-                    onClick={() => hospitalsAPI.approveRequest(r.id,r.hospitalId) && refetch }
-                    disabled={approve.loading}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={hospitalsAPI.rejectRequest(r.id,r.hospitalId) && refetch }
-                    disabled={reject.loading}
-                  >
-                    Reject
-                  </Button>
-                </TableCell>
+               <TableCell className="text-right">
+  <div className="inline-flex items-center justify-end gap-2">
+    <Button
+      variant="outline"
+      size="sm"
+      className="h-9 px-3 gap-2"
+      disabled={approve.loading || reject.loading}
+      onClick={async () => {
+        try {
+          setPendingAction({ id: r.id, type: "approve" });
+          await onApprove(r.id, r.hospitalId);
+        } finally {
+          setPendingAction(null);
+        }
+      }}
+    >
+      {pendingAction?.id === r.id && pendingAction?.type === "approve" ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Check className="h-4 w-4" />
+      )}
+      <span className="hidden md:inline">Approve</span>
+    </Button>
+
+    <Button
+      variant="destructive"
+      size="sm"
+      className="h-9 px-3 gap-2"
+      disabled={approve.loading || reject.loading}
+      onClick={async () => {
+        try {
+          setPendingAction({ id: r.id, type: "reject" });
+          await onReject(r.id, r.hospitalId);
+        } finally {
+          setPendingAction(null);
+        }
+      }}
+    >
+      {pendingAction?.id === r.id && pendingAction?.type === "reject" ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <X className="h-4 w-4" />
+      )}
+      <span className="hidden md:inline">Reject</span>
+    </Button>
+  </div>
+</TableCell>
+
               </TableRow>
             ))}
           </TableBody>
