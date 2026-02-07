@@ -135,6 +135,10 @@ export function BloodInventory() {
     totalExpiring += Number(item.expiringSoon) || 0;
   });
 
+
+  
+  console.log('BloodInventory render with dataStats:', dataStats);
+  console.log('BloodInventory totalUnits:', totalUnits, 'totalExpiring:', totalExpiring, 'criticalTypes:', criticalTypes);
   
   return (
     <div className="space-y-6">
