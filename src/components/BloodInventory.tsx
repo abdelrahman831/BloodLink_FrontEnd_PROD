@@ -11,7 +11,10 @@ type InventoryItem = {
   bloodType: number;
 };
 
-     const bloodTypeMap = {
+
+     type bloodTypeMap =Record<number, string>;
+
+const bloodTypeMapp: bloodTypeMap =  {
         3 : 'A+', 4: 'A-', 5: 'B+', 6: 'B-',
         7: 'AB+', 8: 'AB-', 1: 'O+', 2: 'O-'
       };
@@ -191,7 +194,7 @@ export function BloodInventory() {
               <TableBody>
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
-                    <TableCell className="font-bold">{bloodTypeMap[item.bloodType] || item.bloodType}</TableCell>
+                    <TableCell className="font-bold">{bloodTypeMapp[item.bloodType]}</TableCell>
                     <TableCell>{item.unitsAvailable}</TableCell>
                     <TableCell>{item.expiringSoon}</TableCell>
                     <TableCell>{item.averageDemand ?? '—'}</TableCell>
