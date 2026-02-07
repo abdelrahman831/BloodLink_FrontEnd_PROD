@@ -197,6 +197,7 @@ export function BloodInventory() {
               <TableBody>
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
+                    {console.error('Rendering row for bloodType:', item.bloodType, 'availableUnits:', item.availableUnits, 'status:', item.status)}
                     <TableCell className="font-bold">{bloodTypeMapp[item.bloodType]}</TableCell>
                     <TableCell>{item.availableUnits}</TableCell>
                     <TableCell>{item.expiringSoon}</TableCell>
