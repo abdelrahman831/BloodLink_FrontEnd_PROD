@@ -8,8 +8,14 @@ import { inventoryAPI } from '../services/api';
 
 type InventoryItem = {
   HospitalId?: string;
-  bloodType: string;
+  bloodType: number;
 };
+
+     const bloodTypeMap = {
+        3 : 'A+', 4: 'A-', 5: 'B+', 6: 'B-',
+        7: 'AB+', 8: 'AB-', 1: 'O+', 2: 'O-'
+      };
+
 
 type InventoryStatus = {
     HospitalId?: string;
@@ -70,12 +76,16 @@ export function BloodInventory() {
 
 
         const res = await inventoryAPI.getAll(hospitalId);
+        const resStats = await inventoryAPI.getStats(hospitalId);
         const arr = normalizeInventory(res);
-        const stats = normalizeInventoryStats(res);
+        const stats = normalizeInventoryStats(resStats);
         console.log('BloodInventory API response:', res);
         console.log('BloodInventory normalized items:', arr);
         console.log('BloodInventory normalized stats:', stats);
-        if (!cancelled) setData(arr);
+        if (!cancelled) {
+          setData(arr);
+          setDataStats(stats);
+        }
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || String(e));
@@ -94,13 +104,13 @@ export function BloodInventory() {
   }, [hospitalId]);
 
   const totalUnits = useMemo(
-    () => (data || []).reduce((sum, item) => sum + (Number(item.AvailableUnits) || 0), 0),
-    [data]
+    () => (dataStats || []).reduce((sum, item) => sum + (Number(item.AvailableUnits) || 0), 0),
+    [dataStats]
   );
 
   const totalExpiring = useMemo(
-    () => (data || []).reduce((sum, item) => sum + (Number(item.ExpiringSoon) || 0), 0),
-    [data]
+    () => (dataStats || []).reduce((sum, item) => sum + (Number(item.ExpiringSoon) || 0), 0),
+    [dataStats]
   );
 
   const criticalTypes = useMemo(() => {
@@ -181,7 +191,7 @@ export function BloodInventory() {
               <TableBody>
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
-                    <TableCell className="font-bold">{item.bloodType}</TableCell>
+                    <TableCell className="font-bold">{bloodTypeMap[item.bloodType] || item.bloodType}</TableCell>
                     <TableCell>{item.unitsAvailable}</TableCell>
                     <TableCell>{item.expiringSoon}</TableCell>
                     <TableCell>{item.averageDemand ?? '—'}</TableCell>

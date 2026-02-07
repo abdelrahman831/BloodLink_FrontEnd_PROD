@@ -91,6 +91,7 @@ export const inventoryAPI = {
   getHospitalId: () => localStorage.getItem('hospitalId'),
 
   getAll: (id: any) => apiCall(`/BloodUnits/${id}`),
+  getStats: (id: any) => apiCall(`/BloodUnits/stats/${id}`),
   getByType: (bloodType: string) => apiCall(`/BloodUnits/${bloodType}`),
   update: (bloodType: string, data: any) => 
     apiCall(`/BloodUnits/${bloodType}`, {
