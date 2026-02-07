@@ -94,7 +94,7 @@ export const inventoryAPI = {
   getStats: (id: any) => apiCall(`/BloodUnits/stats/${id}`),
   getByType: (bloodType: string) => apiCall(`/BloodUnits/${bloodType}`),
   update: (bloodType: string, data: any) => 
-    apiCall(`/BloodUnits/${bloodType}`, {
+    apiCall(`/BloodUnits/${bloodType}`, { 
       method: 'PUT',
       body: JSON.stringify(data),
     }),
