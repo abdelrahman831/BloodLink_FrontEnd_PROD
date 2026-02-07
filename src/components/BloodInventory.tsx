@@ -9,6 +9,10 @@ import { inventoryAPI } from '../services/api';
 type InventoryItem = {
   HospitalId?: string;
   bloodType: number;
+  AvailableUnits?: number;
+  ExpiringSoon?: number;
+  AverageDemand?: number;
+  status?: string;
 };
 
 
@@ -29,11 +33,10 @@ type InventoryStatus = {
 
 };
 
-function statusBadge(status?: string) {
-  const s = (status || '').toLowerCase();
-  if (s === 'critical') return <Badge variant="destructive">Critical</Badge>;
-  if (s === 'low') return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Low</Badge>;
-  if (s === 'adequate' || s === 'safe') return <Badge className="bg-green-100 text-green-700">Adequate</Badge>;
+function statusBadge(status?: string, availableUnits?: number) {
+  if (availableUnits !== undefined && availableUnits < 5) return <Badge variant="destructive">Critical</Badge>;
+  if (availableUnits !== undefined && availableUnits < 10 && availableUnits >= 5) return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Low</Badge>;
+  if (availableUnits !== undefined && availableUnits >= 10) return <Badge className="bg-green-100 text-green-700">Adequate</Badge>;
   return <Badge variant="outline">—</Badge>;
 }
 
@@ -195,9 +198,9 @@ export function BloodInventory() {
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
                     <TableCell className="font-bold">{bloodTypeMapp[item.bloodType]}</TableCell>
-                    <TableCell>{item.unitsAvailable}</TableCell>
-                    <TableCell>{item.expiringSoon}</TableCell>
-                    <TableCell>{item.averageDemand ?? '—'}</TableCell>
+                    <TableCell>{item.AvailableUnits}</TableCell>
+                    <TableCell>{item.ExpiringSoon}</TableCell>
+                    <TableCell>{item.AverageDemand ?? '—'}</TableCell>
                     <TableCell>{statusBadge(item.status)}</TableCell>
                     <TableCell className="min-w-[160px]">
                       <div className="flex items-center gap-3">
