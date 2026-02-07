@@ -123,10 +123,12 @@ export function BloodInventory() {
 
   const criticalTypes = useMemo(() => {
     return (data || []).filter((item) => {
-      const s = (item.status || '').toLowerCase();
-      return s === 'critical' || s === 'low';
+      const s = item.availableUnits;
+      return s !== undefined && s < 10;
     }).length;
   }, [data]);
+
+
 const totalUnits = dataStats?.availableUnits ?? 0;
 const totalExpiring = dataStats?.expiringSoon ?? 0;
 
