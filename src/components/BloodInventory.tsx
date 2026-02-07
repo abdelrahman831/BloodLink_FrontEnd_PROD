@@ -9,11 +9,15 @@ import { inventoryAPI } from '../services/api';
 type InventoryItem = {
   HospitalId?: string;
   bloodType: string;
-  unitsAvailable: number;
-  expiringSoon: number;
-  averageDemand?: number;
-  status?: 'adequate' | 'low' | 'critical' | string;
-  fillPercentage?: number;
+};
+
+type InventoryStatus = {
+    HospitalId?: string;
+  TotalItems ?: number;
+  AvailableUnits?: number;
+  ExpiringSoon?: number;
+  UsedUnits?: number;
+
 };
 
 function statusBadge(status?: string) {
@@ -31,8 +35,15 @@ function normalizeInventory(data: any): InventoryItem[] {
   return [];
 }
 
+function normalizeInventoryStats(data: any): InventoryStatus[] {
+  if (Array.isArray(data)) return data as InventoryStatus[];
+  if (data && Array.isArray(data.items)) return data.items as InventoryStatus[];
+  return [];
+}
+
 export function BloodInventory() {
   const [data, setData] = useState<InventoryItem[]>([]);
+  const [dataStats, setDataStats] = useState<InventoryStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -50,6 +61,8 @@ export function BloodInventory() {
       try {
         if (!hospitalId) {
           setData([]);
+          setDataStats([]);
+
           setError("hospitalId mancante in localStorage. Salvalo dopo il login (localStorage.setItem('hospitalId', ...)).");
           return;
         }
@@ -58,11 +71,15 @@ export function BloodInventory() {
 
         const res = await inventoryAPI.getAll(hospitalId);
         const arr = normalizeInventory(res);
-
+        const stats = normalizeInventoryStats(res);
+        console.log('BloodInventory API response:', res);
+        console.log('BloodInventory normalized items:', arr);
+        console.log('BloodInventory normalized stats:', stats);
         if (!cancelled) setData(arr);
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || String(e));
+          setDataStats([]);
           setData([]);
         }
       } finally {
@@ -77,12 +94,12 @@ export function BloodInventory() {
   }, [hospitalId]);
 
   const totalUnits = useMemo(
-    () => (data || []).reduce((sum, item) => sum + (Number(item.unitsAvailable) || 0), 0),
+    () => (data || []).reduce((sum, item) => sum + (Number(item.AvailableUnits) || 0), 0),
     [data]
   );
 
   const totalExpiring = useMemo(
-    () => (data || []).reduce((sum, item) => sum + (Number(item.expiringSoon) || 0), 0),
+    () => (data || []).reduce((sum, item) => sum + (Number(item.ExpiringSoon) || 0), 0),
     [data]
   );
 
