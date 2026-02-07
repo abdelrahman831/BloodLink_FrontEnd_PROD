@@ -30,7 +30,7 @@ type InventoryStatus = {
   availableUnits?: number;
   expiringSoon?: number;
   usedUnits?: number;
-
+unitsByBloodType?: Record<string, number>;
 };
 
 function statusBadge(status?: string, availableUnits?: number) {
