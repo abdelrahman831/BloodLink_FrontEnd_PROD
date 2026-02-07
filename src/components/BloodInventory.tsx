@@ -48,16 +48,15 @@ function normalizeInventory(data: any): InventoryItem[] {
   if (data && Array.isArray(data.items)) return data.items as InventoryItem[];
   return [];
 }
-
-function normalizeInventoryStats(dataStats: any): InventoryStatus[] {
-  if (Array.isArray(dataStats)) return dataStats as InventoryStatus[];
-  if (dataStats && Array.isArray(dataStats.items)) return dataStats.items as InventoryStatus[];
-  return [];
+function normalizeInventoryStats(dataStats: any): InventoryStatus | null {
+  if (!dataStats) return null;
+  return dataStats as InventoryStatus;
 }
+
 
 export function BloodInventory() {
   const [data, setData] = useState<InventoryItem[]>([]);
-  const [dataStats, setDataStats] = useState<InventoryStatus[]>([]);
+  const [dataStats, setDataStats] = useState<InventoryStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -90,6 +89,7 @@ export function BloodInventory() {
         console.log('BloodInventory API response:', res);
         console.log('BloodInventory normalized items:', arr);
         console.log('BloodInventory normalized stats:', stats);
+
         if (!cancelled) {
           setData(arr);
           setDataStats(stats);
@@ -127,14 +127,8 @@ export function BloodInventory() {
       return s === 'critical' || s === 'low';
     }).length;
   }, [data]);
-
-  var totalUnits = 0;
-  var totalExpiring = 0;
-
-  dataStats.forEach((item) => {
-    totalUnits += Number(item.availableUnits) || 0;
-    totalExpiring += Number(item.expiringSoon) || 0;
-  });
+const totalUnits = dataStats?.availableUnits ?? 0;
+const totalExpiring = dataStats?.expiringSoon ?? 0;
 
 
 
