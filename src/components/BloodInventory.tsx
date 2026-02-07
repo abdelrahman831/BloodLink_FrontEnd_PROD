@@ -34,6 +34,8 @@ type InventoryStatus = {
 };
 
 function statusBadge(status?: string, availableUnits?: number) {
+
+console.log('statusBadge called with status:', status, 'availableUnits:', availableUnits);
   if (availableUnits !== undefined && availableUnits < 5) return <Badge variant="destructive">Critical</Badge>;
   if (availableUnits !== undefined && availableUnits < 10 && availableUnits >= 5) return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Low</Badge>;
   if (availableUnits !== undefined && availableUnits >= 10) return <Badge className="bg-green-100 text-green-700">Adequate</Badge>;
