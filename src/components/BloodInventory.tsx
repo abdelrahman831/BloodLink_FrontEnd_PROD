@@ -26,7 +26,7 @@ const bloodTypeMapp: bloodTypeMap =  {
 
 type InventoryStatus = {
     HospitalId?: string;
-  totalItems ?: number;
+  totalUnits ?: number;
   availableUnits?: number;
   expiringSoon?: number;
   usedUnits?: number;
@@ -130,10 +130,12 @@ export function BloodInventory() {
 
   var totalUnits = 0;
   var totalExpiring = 0;
+
   dataStats.forEach((item) => {
-    totalUnits += Number(item.totalItems) || 0;
+    totalUnits += Number(item.availableUnits) || 0;
     totalExpiring += Number(item.expiringSoon) || 0;
   });
+
 
 
   
