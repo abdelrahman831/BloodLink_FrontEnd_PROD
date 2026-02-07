@@ -212,7 +212,7 @@ export function BloodInventory() {
                     <TableCell>{item.availableUnits}</TableCell>
                     <TableCell>{item.expiringSoon}</TableCell>
                     <TableCell>{item.averageDemand ?? '—'}</TableCell>
-                    <TableCell>{statusBadge(item.status, item.availableUnits)}</TableCell>
+                    <TableCell>{statusBadge(item.status, item.availableUnits) }</TableCell>
                     <TableCell className="min-w-[160px]">
                       <div className="flex items-center gap-3">
                         <Progress value={item.fillPercentage ?? 0} />
