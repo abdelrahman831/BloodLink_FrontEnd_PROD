@@ -26,10 +26,10 @@ const bloodTypeMapp: bloodTypeMap =  {
 
 type InventoryStatus = {
     HospitalId?: string;
-  TotalItems ?: number;
-  AvailableUnits?: number;
-  ExpiringSoon?: number;
-  UsedUnits?: number;
+  totalItems ?: number;
+  availableUnits?: number;
+  expiringSoon?: number;
+  usedUnits?: number;
 
 };
 
@@ -47,9 +47,9 @@ function normalizeInventory(data: any): InventoryItem[] {
   return [];
 }
 
-function normalizeInventoryStats(data: any): InventoryStatus[] {
-  if (Array.isArray(data)) return data as InventoryStatus[];
-  if (data && Array.isArray(data.items)) return data.items as InventoryStatus[];
+function normalizeInventoryStats(dataStats: any): InventoryStatus[] {
+  if (Array.isArray(dataStats)) return dataStats as InventoryStatus[];
+  if (dataStats && Array.isArray(dataStats.items)) return dataStats.items as InventoryStatus[];
   return [];
 }
 
@@ -109,15 +109,15 @@ export function BloodInventory() {
     };
   }, [hospitalId]);
 
-  const totalUnits = useMemo(
-    () => (dataStats || []).reduce((sum, item) => sum + (Number(item.AvailableUnits) || 0), 0),
-    [dataStats]
-  );
+  // const totalUnits = useMemo(
+  //   () => (dataStats || []).reduce((sum, item) => sum + (Number(item.AvailableUnits) || 0), 0),
+  //   [dataStats]
+  // );
 
-  const totalExpiring = useMemo(
-    () => (dataStats || []).reduce((sum, item) => sum + (Number(item.ExpiringSoon) || 0), 0),
-    [dataStats]
-  );
+  // const totalExpiring = useMemo(
+  //   () => (dataStats || []).reduce((sum, item) => sum + (Number(item.ExpiringSoon) || 0), 0),
+  //   [dataStats]
+  // );
 
   const criticalTypes = useMemo(() => {
     return (data || []).filter((item) => {
@@ -126,6 +126,14 @@ export function BloodInventory() {
     }).length;
   }, [data]);
 
+  var totalUnits = 0;
+  var totalExpiring = 0;
+  dataStats.forEach((item) => {
+    totalUnits += Number(item.totalItems) || 0;
+    totalExpiring += Number(item.expiringSoon) || 0;
+  });
+
+  
   return (
     <div className="space-y-6">
       <div>
@@ -148,7 +156,7 @@ export function BloodInventory() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Total Units</p>
-              <h3 className="mt-1 text-2xl font-bold">{loading ? '—' : totalUnits.toLocaleString()}</h3>
+              <h3 className="mt-1 text-2xl font-bold">{loading ? '—' : totalUnits}</h3>
             </div>
             <Droplet className="w-8 h-8 text-blue-500" />
           </div>
@@ -195,9 +203,9 @@ export function BloodInventory() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
-                    {console.error('Rendering row for bloodType:', item.bloodType, 'availableUnits:', item.availableUnits, 'status:', item.status)}
                     <TableCell className="font-bold">{bloodTypeMapp[item.bloodType]}</TableCell>
                     <TableCell>{item.availableUnits}</TableCell>
                     <TableCell>{item.expiringSoon}</TableCell>
