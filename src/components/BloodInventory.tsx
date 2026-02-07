@@ -9,9 +9,9 @@ import { inventoryAPI } from '../services/api';
 type InventoryItem = {
   HospitalId?: string;
   bloodType: number;
-  AvailableUnits?: number;
-  ExpiringSoon?: number;
-  AverageDemand?: number;
+  availableUnits?: number;
+  expiringSoon?: number;
+  averageDemand?: number;
   status?: string;
 };
 
@@ -198,10 +198,10 @@ export function BloodInventory() {
                 {data.map((item) => (
                   <TableRow key={item.bloodType}>
                     <TableCell className="font-bold">{bloodTypeMapp[item.bloodType]}</TableCell>
-                    <TableCell>{item.AvailableUnits}</TableCell>
-                    <TableCell>{item.ExpiringSoon}</TableCell>
-                    <TableCell>{item.AverageDemand ?? '—'}</TableCell>
-                    <TableCell>{statusBadge(item.status)}</TableCell>
+                    <TableCell>{item.availableUnits}</TableCell>
+                    <TableCell>{item.expiringSoon}</TableCell>
+                    <TableCell>{item.averageDemand ?? '—'}</TableCell>
+                    <TableCell>{statusBadge(item.status, item.availableUnits)}</TableCell>
                     <TableCell className="min-w-[160px]">
                       <div className="flex items-center gap-3">
                         <Progress value={item.fillPercentage ?? 0} />
