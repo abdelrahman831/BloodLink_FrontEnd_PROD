@@ -51,11 +51,11 @@ export function DashboardOverview() {
 
   console.log('Dashboard stats:', stats, 'Loading:', statsLoading, 'Error:', statsError);
   
-  const filteredHospitals = useMemo(() => {
-    if (!hospitals) return [];
-    if (!selectedBloodType) return hospitals;
-    return hospitals.filter((h) => (h.bloodTypes || []).includes(selectedBloodType));
-  }, [hospitals, selectedBloodType]);
+  // const filteredHospitals = useMemo(() => {
+  //   if (!hospitals) return [];
+  //   if (!selectedBloodType) return hospitals;
+  //   return hospitals.filter((h) => (h.bloodTypes || []).includes(selectedBloodType));
+  // }, [hospitals, selectedBloodType]);
 
   const mapUrl = useMemo(() => {
     const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
