@@ -4,38 +4,27 @@ import { Droplet, MapPin, Search } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useAPI } from '../hooks/useAPI';
 import { dashboardAPI } from '../services/api';
+import { get } from 'https';
 
-type ConsumptionPoint = {
-  day: string;
-  consumption: number;
-  donations: number;
-};
 
-type BloodTypeDonation = {
-  bloodType: string;
-  count: number;
-};
 
-type Hospital = {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
-  status?: string; // adequate | low | critical (opzionale)
-  inventory?: number; // percentuale o units (dipende dal backend)
-  bloodTypes?: string[];
-  address?: string;
-  openRequests?: number;
-};
 
 type DashboardStats = {
-  totalUnitsAvailable?: number;
-  openUrgentRequests?: number;
-  expiringSoonPercent?: number;
-  avgResponseTimeHours?: number;
-  campaignsToday?: number;
-  campaignsThisWeek?: number;
+        UnitsAvailable: number;
+        UnitsExpiringSoon: number;
+        UnitsTotal: number;
+        EmergencyRequests: number;
+        AverageResponseTime: number;
+        CampainsToday: number;
+         CampainsTotal: number;
+        DonationsTotal: number;
+        DonationsToday: number;
+         HospitalRequests: number;
+         HospitalTotal: number;
 };
+
+
+
 
 const bloodTypeOptions = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
@@ -50,27 +39,18 @@ function StatusPill({ status }: { status?: string }) {
 export function DashboardOverview() {
   const [selectedBloodType, setSelectedBloodType] = useState('');
   const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
+  const hospitalId = localStorage.getItem('hospitalId');
+
+  
 
   const { data: stats, loading: statsLoading, error: statsError } = useAPI<DashboardStats>(
-    () => dashboardAPI.getStats(),
-    []
+    () => dashboardAPI.getStats(hospitalId),
+    [hospitalId]
   );
 
-  const { data: trendData, loading: trendLoading, error: trendError } = useAPI<ConsumptionPoint[]>(
-    () => dashboardAPI.getDailyConsumption(),
-    []
-  );
 
-  const { data: weekly, loading: weeklyLoading, error: weeklyError } = useAPI<BloodTypeDonation[]>(
-    () => dashboardAPI.getWeeklyDonations(),
-    []
-  );
-
-  const { data: hospitals, loading: hospitalsLoading, error: hospitalsError } = useAPI<Hospital[]>(
-    () => dashboardAPI.getHospitals(),
-    []
-  );
-
+  console.log('Dashboard stats:', stats, 'Loading:', statsLoading, 'Error:', statsError);
+  
   const filteredHospitals = useMemo(() => {
     if (!hospitals) return [];
     if (!selectedBloodType) return hospitals;

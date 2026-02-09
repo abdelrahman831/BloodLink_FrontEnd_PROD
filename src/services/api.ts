@@ -79,10 +79,10 @@ export async function apiCall<T>(
 
 // Dashboard APIs
 export const dashboardAPI = {
-  getStats: () => apiCall('/dashboard/stats'),
-  getDailyConsumption: () => apiCall('/dashboard/consumption'),
-  getWeeklyDonations: () => apiCall('/dashboard/donations/weekly'),
-  getHospitals: () => apiCall('/dashboard/hospitals'),
+  getStats: (id: any) => apiCall(`/dashboard/${id}`),
+  // getDailyConsumption: () => apiCall('/dashboard/consumption'),
+  // getWeeklyDonations: () => apiCall('/dashboard/donations/weekly'),
+  // getHospitals: () => apiCall('/dashboard/hospitals'),
 };
 
 // Blood Inventory APIs
