@@ -30,11 +30,11 @@ type RequestItem = {
 function statusBadge(status: number) {
   const s = status;
 
-  if (s === 1) return <Badge variant="secondary">Pending</Badge>;
-  if (s === 2) return <Badge className="bg-blue-100 text-blue-700">Approved</Badge>;
-  if (s === 3) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
-  if (s === 4) return <Badge className="bg-green-100 text-green-700">Delivered</Badge>;
-  if (s === 5) return <Badge variant="destructive">Failed</Badge>;
+  if (s === 0) return <Badge variant="secondary">Pending</Badge>;
+  if (s === 1) return <Badge className="bg-blue-100 text-blue-700">Approved</Badge>;
+  if (s === 2) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
+  if (s === 3) return <Badge className="bg-green-100 text-green-700">Delivered</Badge>;
+  if (s === 4) return <Badge variant="destructive">Failed</Badge>;
   return <Badge variant="outline">{status}</Badge>;
 }
 
