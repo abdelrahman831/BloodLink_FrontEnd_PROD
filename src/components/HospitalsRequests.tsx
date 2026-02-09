@@ -18,7 +18,7 @@ type RequestItem = {
   id: number;
   hospitalId: number;
   hospitalName?: string;
-  bloodType: string;
+  bloodType: number;
   component?: string;
   units: number;
   priority?: 'urgent' | 'normal' | string;
