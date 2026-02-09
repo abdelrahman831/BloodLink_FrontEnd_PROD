@@ -22,18 +22,19 @@ type RequestItem = {
   component?: string;
   units: number;
   priority?: 'urgent' | 'normal' | string;
-  status: 'pending' | 'approved' | 'transit' | 'delivered' | 'failed' | string;
+  status: number;
   createdAt?: Date;
   updatedAt?: Date;
 };
 
-function statusBadge(status: string) {
+function statusBadge(status: number) {
   const s = status;
-  if (s.includes('pending')) return <Badge variant="secondary">Pending</Badge>;
-  if (s.includes('approved')) return <Badge className="bg-blue-100 text-blue-700">Approved</Badge>;
-  if (s.includes('transit')) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
-  if (s.includes('delivered')) return <Badge className="bg-green-100 text-green-700">Delivered</Badge>;
-  if (s.includes('failed')) return <Badge variant="destructive">Failed</Badge>;
+
+  if (s === 1) return <Badge variant="secondary">Pending</Badge>;
+  if (s === 2) return <Badge className="bg-blue-100 text-blue-700">Approved</Badge>;
+  if (s === 3) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
+  if (s === 4) return <Badge className="bg-green-100 text-green-700">Delivered</Badge>;
+  if (s === 5) return <Badge variant="destructive">Failed</Badge>;
   return <Badge variant="outline">{status}</Badge>;
 }
 
