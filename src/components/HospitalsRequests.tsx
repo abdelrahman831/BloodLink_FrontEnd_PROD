@@ -22,13 +22,13 @@ type RequestItem = {
   component?: string;
   units: number;
   priority?: 'urgent' | 'normal' | string;
-  status: 'Pending' | 'Approved' | 'In Transit' | 'Delivered' | 'Failed' | string;
+  status: 'pending' | 'approved' | 'transit' | 'delivered' | 'failed' | string;
   createdAt?: Date;
   updatedAt?: Date;
 };
 
 function statusBadge(status: string) {
-  const s = status.toLowerCase();
+  const s = status;
   if (s.includes('pending')) return <Badge variant="secondary">Pending</Badge>;
   if (s.includes('approved')) return <Badge className="bg-blue-100 text-blue-700">Approved</Badge>;
   if (s.includes('transit')) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
