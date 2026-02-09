@@ -1,67 +1,180 @@
 import { useMemo, useState } from 'react';
 import { Card } from './ui/card';
 import { Droplet, MapPin, Search } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { useAPI } from '../hooks/useAPI';
-import { dashboardAPI } from '../services/api';
-import { get } from 'https';
+import { dashboardAPI,hospitalsAPI } from '../services/api';
 
-
-
-
-type DashboardStats = {
-        UnitsAvailable: number;
-        UnitsExpiringSoon: number;
-        UnitsTotal: number;
-        EmergencyRequests: number;
-        AverageResponseTime: number;
-        CampainsToday: number;
-         CampainsTotal: number;
-        DonationsTotal: number;
-        DonationsToday: number;
-         HospitalRequests: number;
-         HospitalTotal: number;
+type DashboardStatsApi = {
+  hospitalId: string;
+  totalUnits: number;
+  availableUnits: number;
+  usedUnits: number;
+  expiringSoon: number;
+  unitsByBloodType: Array<Record<string, number>>; // es: [{ "O_p": 1 }]
+  // Se la tua API dashboard include anche questi, lasciali qui:
+  emergencyRequests?: number;
+  averageResponseTime?: number;
+  campainsToday?: number;
+  campainsTotal?: number;
+  donationsTotal?: number;
+  donationsToday?: number;
+  hospitalRequests?: number;
+  hospitalTotal?: number;
 };
 
+type TrendPoint = {
+  day: string; // "2026-02-01" o "Mon"
+  consumption: number;
+  donations: number;
+};
 
+type WeeklyDonation = {
+  bloodType: string; // "O+"
+  count: number;
+};
 
+type HospitalItem = {
+  id: number;
+  name: string;
+  address?: string;
+  lat?: number;
+  lng?: number;
+  status?: string;
+  inventory?: number;
+  openRequests?: number;
+  bloodTypes?: string[];
+};
 
 const bloodTypeOptions = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
 function StatusPill({ status }: { status?: string }) {
   const s = (status || '').toLowerCase();
-  if (s === 'adequate' || s === 'safe') return <span className="px-2 py-1 rounded-md text-white text-xs font-bold" style={{ backgroundColor: '#10b981' }}>✅ Adequate</span>;
-  if (s === 'low' || s === 'medium') return <span className="px-2 py-1 rounded-md text-white text-xs font-bold" style={{ backgroundColor: '#f59e0b' }}>⚠️ Low</span>;
-  if (s === 'critical' || s === 'severe') return <span className="px-2 py-1 rounded-md text-white text-xs font-bold" style={{ backgroundColor: '#ef4444' }}>🚨 Critical</span>;
-  return <span className="px-2 py-1 rounded-md text-gray-700 text-xs font-semibold bg-gray-100">—</span>;
+  if (s === 'adequate' || s === 'safe')
+    return (
+      <span
+        className="px-2 py-1 rounded-md text-white text-xs font-bold"
+        style={{ backgroundColor: '#10b981' }}
+      >
+        ✅ Adequate
+      </span>
+    );
+  if (s === 'low' || s === 'medium')
+    return (
+      <span
+        className="px-2 py-1 rounded-md text-white text-xs font-bold"
+        style={{ backgroundColor: '#f59e0b' }}
+      >
+        ⚠️ Low
+      </span>
+    );
+  if (s === 'critical' || s === 'severe')
+    return (
+      <span
+        className="px-2 py-1 rounded-md text-white text-xs font-bold"
+        style={{ backgroundColor: '#ef4444' }}
+      >
+        🚨 Critical
+      </span>
+    );
+  return (
+    <span className="px-2 py-1 rounded-md text-gray-700 text-xs font-semibold bg-gray-100">
+      —
+    </span>
+  );
+}
+
+// Utility: se la tua api usa Axios, spesso ritorna { data: ... }
+function unwrap<T>(res: any): T {
+  return (res?.data ?? res) as T;
+}
+
+function normalizeArray<T>(res: any): T[] {
+  const data = res?.data ?? res;
+  if (Array.isArray(data)) return data as T[];
+  if (data && Array.isArray(data.items)) return data.items as T[];
+  return [];
 }
 
 export function DashboardOverview() {
   const [selectedBloodType, setSelectedBloodType] = useState('');
   const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
-  const hospitalId = localStorage.getItem('hospitalId');
 
-  
+  const hospitalId = useMemo(() => localStorage.getItem('hospitalId') || '', []);
 
-  const { data: stats, loading: statsLoading, error: statsError } = useAPI<DashboardStats>(
+  // STATS
+  const {
+    data: statsRes,
+    loading: statsLoading,
+    error: statsError,
+  } = useAPI<DashboardStatsApi | any>(
     () => dashboardAPI.getStats(hospitalId),
     [hospitalId]
   );
 
+  const stats = useMemo(() => {
+    if (!statsRes) return null;
+    return unwrap<DashboardStatsApi>(statsRes);
+  }, [statsRes]);
 
-  console.log('Dashboard stats:', stats, 'Loading:', statsLoading, 'Error:', statsError);
-  
-  // const filteredHospitals = useMemo(() => {
-  //   if (!hospitals) return [];
-  //   if (!selectedBloodType) return hospitals;
-  //   return hospitals.filter((h) => (h.bloodTypes || []).includes(selectedBloodType));
-  // }, [hospitals, selectedBloodType]);
+  // TREND
+  const {
+    data: trendRes,
+    loading: trendLoading,
+    error: trendError,
+  } = useAPI<TrendPoint[] | any>(
+    () => dashboardAPI.getTrend(hospitalId),
+    [hospitalId]
+  );
+
+  const trendData = useMemo(() => normalizeArray<TrendPoint>(trendRes), [trendRes]);
+
+  // WEEKLY
+  const {
+    data: weeklyRes,
+    loading: weeklyLoading,
+    error: weeklyError,
+  } = useAPI<WeeklyDonation[] | any>(
+    () => dashboardAPI.getWeeklyDonations(hospitalId),
+    [hospitalId]
+  );
+
+  const weekly = useMemo(() => normalizeArray<WeeklyDonation>(weeklyRes), [weeklyRes]);
+
+  // HOSPITALS
+  const {
+    data: hospitalsRes,
+    loading: hospitalsLoading,  
+    error: hospitalsError,
+  } = useAPI<HospitalItem[] | any>(
+    () => hospitalsAPI.getAll(),
+    [hospitalId]
+  );
+
+  const hospitals = useMemo(() => normalizeArray<HospitalItem>(hospitalsRes), [hospitalsRes]);
+
+  const filteredHospitals = useMemo(() => {
+    if (!selectedBloodType) return hospitals;
+    return hospitals.filter((h) => (h.bloodTypes || []).includes(selectedBloodType));
+  }, [hospitals, selectedBloodType]);
 
   const mapUrl = useMemo(() => {
     const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
     if (!key) return null;
 
-    const selected = selectedHospitalId ? filteredHospitals.find((h) => h.id === selectedHospitalId) : null;
+    const selected = selectedHospitalId
+      ? filteredHospitals.find((h) => h.id === selectedHospitalId)
+      : null;
+
     if (selected?.lat && selected?.lng) {
       return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected.lat},${selected.lng}&zoom=15`;
     }
@@ -77,43 +190,46 @@ export function DashboardOverview() {
           <span>Dashboard Overview</span>
           <Droplet className="w-8 h-8 text-red-500" />
         </h1>
-        <p className="text-gray-600 mt-2">Panoramica live (solo dati da API — niente dummy)</p>
+        <p className="text-gray-600 mt-2">Panoramica live (solo dati da API)</p>
       </div>
 
       {anyError && (
         <Card className="p-4 border border-red-200 bg-red-50">
           <p className="text-sm text-red-700 font-semibold">Errore nel caricamento dati.</p>
-          <p className="text-xs text-red-600 mt-1">
-            {String(anyError.message || anyError)}
-          </p>
+          <p className="text-xs text-red-600 mt-1">{String((anyError as any)?.message || anyError)}</p>
         </Card>
       )}
 
-      {/* KPI cards */}
+      {/* KPI cards (allineati ai campi reali) */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <Card className="p-4">
           <p className="text-xs text-gray-600">Unità disponibili</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.totalUnitsAvailable ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.availableUnits ?? '—')}</p>
         </Card>
+
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Urgenti aperte</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.openUrgentRequests ?? '—')}</p>
+          <p className="text-xs text-gray-600">Unità totali</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.totalUnits ?? '—')}</p>
         </Card>
+
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Scadenza vicina %</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.expiringSoonPercent ?? '—')}</p>
+          <p className="text-xs text-gray-600">Scadenza vicina</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.expiringSoon ?? '—')}</p>
         </Card>
+
+        <Card className="p-4">
+          <p className="text-xs text-gray-600">Richieste urgenti</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.emergencyRequests ?? '—')}</p>
+        </Card>
+
         <Card className="p-4">
           <p className="text-xs text-gray-600">Tempo risposta medio (h)</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.avgResponseTimeHours ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.averageResponseTime ?? '—')}</p>
         </Card>
+
         <Card className="p-4">
           <p className="text-xs text-gray-600">Carovane oggi</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.campaignsToday ?? '—')}</p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-xs text-gray-600">Carovane settimana</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.campaignsThisWeek ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.campainsToday ?? '—')}</p>
         </Card>
       </div>
 
@@ -124,6 +240,7 @@ export function DashboardOverview() {
             <Search className="w-6 h-6 text-red-600" />
             <h3 className="text-lg font-bold text-red-900">Filtra per gruppo sanguigno</h3>
           </div>
+
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedBloodType('')}
@@ -135,6 +252,7 @@ export function DashboardOverview() {
             >
               Tutti
             </button>
+
             {bloodTypeOptions.map((type) => (
               <button
                 key={type}
@@ -149,11 +267,14 @@ export function DashboardOverview() {
               </button>
             ))}
           </div>
+
           {selectedBloodType && (
             <div className="p-4 bg-white rounded-lg border-2 border-red-300 shadow-sm">
               <p className="text-base text-gray-800">
-                <span className="font-bold text-red-700 text-lg">{hospitalsLoading ? '…' : filteredHospitals.length}</span>
-                {' '}strutture hanno{' '}
+                <span className="font-bold text-red-700 text-lg">
+                  {hospitalsLoading ? '…' : filteredHospitals.length}
+                </span>{' '}
+                strutture hanno{' '}
                 <span className="font-bold text-red-800 text-lg">{selectedBloodType}</span>
               </p>
             </div>
@@ -176,6 +297,7 @@ export function DashboardOverview() {
             {!hospitalsLoading && filteredHospitals.length === 0 && (
               <p className="text-sm text-gray-600">Nessun risultato.</p>
             )}
+
             {filteredHospitals.map((h) => (
               <button
                 type="button"
@@ -198,10 +320,20 @@ export function DashboardOverview() {
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-700">
-                  {typeof h.inventory === 'number' && <span><b>Stock:</b> {h.inventory}</span>}
-                  {typeof h.openRequests === 'number' && <span><b>Open req:</b> {h.openRequests}</span>}
+                  {typeof h.inventory === 'number' && (
+                    <span>
+                      <b>Stock:</b> {h.inventory}
+                    </span>
+                  )}
+                  {typeof h.openRequests === 'number' && (
+                    <span>
+                      <b>Open req:</b> {h.openRequests}
+                    </span>
+                  )}
                   {(h.bloodTypes?.length ?? 0) > 0 && (
-                    <span className="truncate"><b>Types:</b> {h.bloodTypes!.join(', ')}</span>
+                    <span className="truncate">
+                      <b>Types:</b> {h.bloodTypes!.join(', ')}
+                    </span>
                   )}
                 </div>
               </button>
@@ -213,7 +345,8 @@ export function DashboardOverview() {
               <div className="p-6">
                 <p className="text-sm text-gray-700 font-semibold">Mappa non configurata.</p>
                 <p className="text-xs text-gray-600 mt-1">
-                  Aggiungi <code className="px-1 bg-gray-100 rounded">VITE_GOOGLE_MAPS_API_KEY</code> nel tuo <code className="px-1 bg-gray-100 rounded">.env</code>.
+                  Aggiungi <code className="px-1 bg-gray-100 rounded">VITE_GOOGLE_MAPS_API_KEY</code> nel tuo{' '}
+                  <code className="px-1 bg-gray-100 rounded">.env</code>.
                 </p>
               </div>
             ) : (
@@ -239,11 +372,11 @@ export function DashboardOverview() {
         </div>
 
         {trendLoading && <p className="text-sm text-gray-600">Caricamento…</p>}
-        {!trendLoading && (!trendData || trendData.length === 0) && (
+        {!trendLoading && trendData.length === 0 && (
           <p className="text-sm text-gray-600">Nessun dato trend disponibile.</p>
         )}
 
-        {!!trendData?.length && (
+        {trendData.length > 0 && (
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
@@ -263,15 +396,16 @@ export function DashboardOverview() {
       {/* Weekly donations */}
       <Card className="p-6 shadow-xl">
         <h3 className="text-xl font-bold">Donazioni settimanali per gruppo</h3>
+
         {weeklyLoading && <p className="text-sm text-gray-600 mt-2">Caricamento…</p>}
-        {!weeklyLoading && (!weekly || weekly.length === 0) && (
+        {!weeklyLoading && weekly.length === 0 && (
           <p className="text-sm text-gray-600 mt-2">Nessun dato disponibile.</p>
         )}
 
-        {!!weekly?.length && (
+        {weekly.length > 0 && (
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
             {weekly.map((w) => (
-              <div key={w.bloodType} className="p-3 rounded-lg border bg-white">
+              <div key={`${w.bloodType}-${w.count}`} className="p-3 rounded-lg border bg-white">
                 <p className="text-sm text-gray-600">{w.bloodType}</p>
                 <p className="text-xl font-bold">{w.count}</p>
               </div>
