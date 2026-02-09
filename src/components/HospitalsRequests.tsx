@@ -23,7 +23,8 @@ type RequestItem = {
   units: number;
   priority?: 'urgent' | 'normal' | string;
   status: 'Pending' | 'Approved' | 'In Transit' | 'Delivered' | 'Failed' | string;
-  createdAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 function statusBadge(status: string) {
