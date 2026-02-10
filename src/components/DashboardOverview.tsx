@@ -127,28 +127,28 @@ export function DashboardOverview() {
   }, [statsRes]);
 
   // TREND
-  const {
-    data: trendRes,
-    loading: trendLoading,
-    error: trendError,
-  } = useAPI<TrendPoint[] | any>(
-    () => dashboardAPI.getTrend(hospitalId),
-    [hospitalId]
-  );
+  // const {
+  //   data: trendRes,
+  //   loading: trendLoading,
+  //   error: trendError,
+  // } = useAPI<TrendPoint[] | any>(
+  //   () => dashboardAPI.getTrend(hospitalId),
+  //   [hospitalId]
+  // );
 
-  const trendData = useMemo(() => normalizeArray<TrendPoint>(trendRes), [trendRes]);
+  // const trendData = useMemo(() => normalizeArray<TrendPoint>(trendRes), [trendRes]);
 
-  // WEEKLY
-  const {
-    data: weeklyRes,
-    loading: weeklyLoading,
-    error: weeklyError,
-  } = useAPI<WeeklyDonation[] | any>(
-    () => dashboardAPI.getWeeklyDonations(hospitalId),
-    [hospitalId]
-  );
+  // // WEEKLY
+  // const {
+  //   data: weeklyRes,
+  //   loading: weeklyLoading,
+  //   error: weeklyError,
+  // } = useAPI<WeeklyDonation[] | any>(
+  //   () => dashboardAPI.getWeeklyDonations(hospitalId),
+  //   [hospitalId]
+  // );
 
-  const weekly = useMemo(() => normalizeArray<WeeklyDonation>(weeklyRes), [weeklyRes]);
+  // const weekly = useMemo(() => normalizeArray<WeeklyDonation>(weeklyRes), [weeklyRes]);
 
   // HOSPITALS
   const {
