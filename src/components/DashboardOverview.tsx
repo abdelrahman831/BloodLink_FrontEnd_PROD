@@ -181,7 +181,7 @@ export function DashboardOverview() {
     return `https://www.google.com/maps/embed/v1/place?key=${key}&q=Cairo,Egypt&zoom=11`;
   }, [filteredHospitals, selectedHospitalId]);
 
-  const anyError = statsError || trendError || weeklyError || hospitalsError;
+  const anyError = statsError || hospitalsError;
 
   return (
     <div className="space-y-6">
@@ -365,7 +365,7 @@ export function DashboardOverview() {
         </div>
       </Card>
 
-      {/* Trends */}
+      {/* Trends
       <Card className="p-6 shadow-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold">Consumi vs Donazioni</h3>
@@ -394,7 +394,7 @@ export function DashboardOverview() {
       </Card>
 
       {/* Weekly donations */}
-      <Card className="p-6 shadow-xl">
+      {/* <Card className="p-6 shadow-xl">
         <h3 className="text-xl font-bold">Donazioni settimanali per gruppo</h3>
 
         {weeklyLoading && <p className="text-sm text-gray-600 mt-2">Caricamento…</p>}
@@ -412,7 +412,9 @@ export function DashboardOverview() {
             ))}
           </div>
         )}
-      </Card>
+      </Card>  */}
+
+
     </div>
   );
 }
