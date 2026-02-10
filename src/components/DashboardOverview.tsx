@@ -15,22 +15,19 @@ import { useAPI } from '../hooks/useAPI';
 import { dashboardAPI,hospitalsAPI } from '../services/api';
 
 type DashboardStatsApi = {
-  hospitalId: string;
-  unitsTotal: number;
   unitsAvailable: number;
-  usedUnits: number;
   unitsExpiringSoon: number;
-  unitsByBloodType: Array<Record<string, number>>; // es: [{ "O_p": 1 }]
-  // Se la tua API dashboard include anche questi, lasciali qui:
-  emergencyRequests?: number;
-  averageResponseTime?: number;
-  campainsToday?: number;
-  campainsTotal?: number;
-  donationsTotal?: number;
-  donationsToday?: number;
-  hospitalRequests?: number;
-  hospitalTotal?: number;
+  unitsTotal: number;
+  emergencyRequests: number | null;
+  averageResponseTime: number;
+  campainsToday: number | null;
+  campainsTotal: number;
+  donationsTotal: number;
+  donationsToday: number;
+  hospitalRequests: number | null;
+  hospitalTotal: number | null;
 };
+
 
 type TrendPoint = {
   day: string; // "2026-02-01" o "Mon"
@@ -121,10 +118,11 @@ export function DashboardOverview() {
     [hospitalId]
   );
 
-  const stats = useMemo(() => {
-    if (!statsRes) return null;
-    return unwrap<DashboardStatsApi>(statsRes);
-  }, [statsRes]);
+
+const stats = useMemo<DashboardStatsApi | null>(() => {
+  if (!statsRes) return null;
+  return ((statsRes as any)?.data ?? statsRes) as DashboardStatsApi;
+}, [statsRes]);
 
   // TREND
   // const {
