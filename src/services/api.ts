@@ -79,7 +79,7 @@ export async function apiCall<T>(
 
 // Dashboard APIs
 export const dashboardAPI = {
-  getStats: (id: any) => apiCall(`DashBoard/dashboard/${id}`),
+  getStats: (id: any) => apiCall(`/DashBoard/dashboard/${id}`),
   // getDailyConsumption: () => apiCall('/dashboard/consumption'),
   // getWeeklyDonations: () => apiCall('/dashboard/donations/weekly'),
   // getHospitals: () => apiCall('/dashboard/hospitals'),
