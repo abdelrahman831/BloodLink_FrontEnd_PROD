@@ -16,10 +16,10 @@ import { dashboardAPI,hospitalsAPI } from '../services/api';
 
 type DashboardStatsApi = {
   hospitalId: string;
-  totalUnits: number;
-  availableUnits: number;
+  unitsTotal: number;
+  unitsAvailable: number;
   usedUnits: number;
-  expiringSoon: number;
+  unitsExpiringSoon: number;
   unitsByBloodType: Array<Record<string, number>>; // es: [{ "O_p": 1 }]
   // Se la tua API dashboard include anche questi, lasciali qui:
   emergencyRequests?: number;
@@ -204,17 +204,17 @@ export function DashboardOverview() {
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <Card className="p-4">
           <p className="text-xs text-gray-600">Unità disponibili</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.availableUnits ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsAvailable ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
           <p className="text-xs text-gray-600">Unità totali</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.totalUnits ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsTotal ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
           <p className="text-xs text-gray-600">Scadenza vicina</p>
-          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.expiringSoon ?? '—')}</p>
+          <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsExpiringSoon ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
