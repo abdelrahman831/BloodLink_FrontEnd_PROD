@@ -47,6 +47,27 @@ const [search, setSearch] = useState("");
 const [sortColumn, setSortColumn] = useState<string | null>(null);
 const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  const { data: hospitals } = useAPI<Hospital[]>(() => hospitalsAPI.getAll(), []);
+  const { data: requests, loading, error, refetch } = useAPI<RequestItem[]>(
+    () => hospitalsAPI.getRequests(),
+    [hospitalId, onlyUrgent]
+  );
+
+  const approve = useMutation((id: any, hospitalId: any) => hospitalsAPI.approveRequest(id, hospitalId));
+  const reject = useMutation((id: any, hospitalId: any) => hospitalsAPI.rejectRequest(id, hospitalId));
+const onApprove = async (id: any, hospitalId: any) => {
+  await approve.mutate(id, hospitalId);
+  await refetch();
+};
+
+const onReject = async (id: any, hospitalId: any) => {
+  await reject.mutate(id, hospitalId);
+  await refetch();
+};
+
+const [pendingAction, setPendingAction] = useState<{ id: number; type: "approve" | "reject" } | null>(null);
+
+
 const handleSort = (column: string) => {
   if (sortColumn === column) {
     setSortDirection(prev => (prev === "asc" ? "desc" : "asc"));
@@ -93,27 +114,6 @@ const filteredAndSorted = useMemo(() => {
     if (onlyUrgent) f.priority = 'urgent';
     return f;
   }, [hospitalId, onlyUrgent]);
-
-  const { data: hospitals } = useAPI<Hospital[]>(() => hospitalsAPI.getAll(), []);
-  const { data: requests, loading, error, refetch } = useAPI<RequestItem[]>(
-    () => hospitalsAPI.getRequests(),
-    [hospitalId, onlyUrgent]
-  );
-
-  const approve = useMutation((id: any, hospitalId: any) => hospitalsAPI.approveRequest(id, hospitalId));
-  const reject = useMutation((id: any, hospitalId: any) => hospitalsAPI.rejectRequest(id, hospitalId));
-const onApprove = async (id: any, hospitalId: any) => {
-  await approve.mutate(id, hospitalId);
-  await refetch();
-};
-
-const onReject = async (id: any, hospitalId: any) => {
-  await reject.mutate(id, hospitalId);
-  await refetch();
-};
-
-const [pendingAction, setPendingAction] = useState<{ id: number; type: "approve" | "reject" } | null>(null);
-
 
   
         const bloodTypeMap = {
