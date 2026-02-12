@@ -27,6 +27,8 @@ type RequestItem = {
   updatedAt?: Date;
 };
 
+
+
 function statusBadge(status: number) {
   const s = status;
 
@@ -41,6 +43,49 @@ function statusBadge(status: number) {
 export function HospitalsRequests() {
   const [hospitalId, setHospitalId] = useState<string>('');
   const [onlyUrgent, setOnlyUrgent] = useState(false);
+const [search, setSearch] = useState("");
+const [sortColumn, setSortColumn] = useState<string | null>(null);
+const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+const handleSort = (column: string) => {
+  if (sortColumn === column) {
+    setSortDirection(prev => (prev === "asc" ? "desc" : "asc"));
+  } else {
+    setSortColumn(column);
+    setSortDirection("asc");
+  }
+};
+
+const filteredAndSorted = useMemo(() => {
+  let data = [...(requests || [])];
+
+  // 🔎 FILTER
+  if (search) {
+    const lower = search.toLowerCase();
+    data = data.filter(r =>
+      r.centerName?.toLowerCase().includes(lower) ||
+      r.userName?.toLowerCase().includes(lower) ||
+      r.phone?.toLowerCase().includes(lower)
+    );
+  }
+
+  // 🔼 SORT
+  if (sortColumn) {
+    data.sort((a, b) => {
+      const aVal = (a as any)[sortColumn];
+      const bVal = (b as any)[sortColumn];
+
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  return data;
+}, [requests, search, sortColumn, sortDirection]);
 
   const filters = useMemo(() => {
     const f: Record<string, string> = {};
@@ -131,17 +176,44 @@ const [pendingAction, setPendingAction] = useState<{ id: number; type: "approve"
           </Button>
           </div>
         </div>
+        <div className="mb-4">
+  <input
+    type="text"
+    placeholder="Search..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="border rounded px-3 py-2 w-full md:w-1/3"
+  />
+</div>
+
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>CenterName</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Blood Type</TableHead>
-              <TableHead>UserName</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+             <TableHead onClick={() => handleSort("centerName")} className="cursor-pointer">
+  CenterName
+</TableHead>
+
+<TableHead onClick={() => handleSort("date")} className="cursor-pointer">
+  Date
+</TableHead>
+
+<TableHead onClick={() => handleSort("bloodType")} className="cursor-pointer">
+  Blood Type
+</TableHead>
+
+<TableHead onClick={() => handleSort("userName")} className="cursor-pointer">
+  UserName
+</TableHead>
+
+<TableHead onClick={() => handleSort("phone")} className="cursor-pointer">
+  Phone
+</TableHead>
+
+<TableHead onClick={() => handleSort("status")} className="cursor-pointer">
+  Status
+</TableHead>
+
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -161,11 +233,10 @@ const [pendingAction, setPendingAction] = useState<{ id: number; type: "approve"
               </TableRow>
             )}
 
-            {(requests || []).map((r) => (
+            {filteredAndSorted.map((r) => (
               <TableRow key={r.id}>
-              {console.log(r)}
-              {console.log(bloodTypeMap[1])}
-              
+             
+             
                 <TableCell>{r.centerName}</TableCell>
                 <TableCell>{format(new Date(r.date),"dd/MM/yyyy")}</TableCell>
                 <TableCell>{bloodTypeMap[parseInt(r.bloodType)]}</TableCell>
