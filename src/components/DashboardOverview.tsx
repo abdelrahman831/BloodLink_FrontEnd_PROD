@@ -176,7 +176,8 @@ const stats = useMemo<DashboardStatsApi | null>(() => {
     if (selected?.latitude && selected?.longitude) {
       return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected.latitude},${selected.longitude}&zoom=15`;
     }
-    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=Cairo,Egypt&zoom=11`;
+return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.latitude},${selected?.longitude}&zoom=15`;
+
   }, [filteredHospitals, selectedHospitalId]);
 
   const anyError = statsError || hospitalsError;
