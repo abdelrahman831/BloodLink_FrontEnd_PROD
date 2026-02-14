@@ -166,7 +166,7 @@ const stats = useMemo<DashboardStatsApi | null>(() => {
   }, [hospitals, selectedBloodType]);
 
   const mapUrl = useMemo(() => {
-    const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+    const key = "AIzaSyAwY83kkJcPLKdwC4jTxKe7Yr1gNnSDSPE"
     if (!key) return null;
 
     const selected = selectedHospitalId
