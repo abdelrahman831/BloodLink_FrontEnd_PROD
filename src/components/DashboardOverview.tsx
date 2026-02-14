@@ -44,8 +44,8 @@ type HospitalItem = {
   id: number;
   name: string;
   address?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   status?: string;
   inventory?: number;
   openRequests?: number;
