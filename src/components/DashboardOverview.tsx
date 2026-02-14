@@ -173,8 +173,8 @@ const stats = useMemo<DashboardStatsApi | null>(() => {
       ? filteredHospitals.find((h) => h.id === selectedHospitalId)
       : null;
 
-    if (selected?.lat && selected?.lng) {
-      return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected.lat},${selected.lng}&zoom=15`;
+    if (selected?.latitude && selected?.longitude) {
+      return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected.latitude},${selected.longitude}&zoom=15`;
     }
     return `https://www.google.com/maps/embed/v1/place?key=${key}&q=Cairo,Egypt&zoom=11`;
   }, [filteredHospitals, selectedHospitalId]);
