@@ -33,16 +33,20 @@ function statusBadge(status: string) {
 export function DonationsCampaigns() {
   const [tab, setTab] = useState<'active' | 'completed' | 'upcoming'>('active');
 
-  let hospitalId = localStorage.getItem('hospitalId') || localStorage.setItem('hospitalId', '1'); // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
+  let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
+  
 
-  const { data, loading, error, refetch } = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId), []);
-
+  
+  const { data: campaignsData, loading, error, refetch } = useAPI(() => campaignsAPI.getById(hospitalId), [hospitalId]);
+  
+  console.log('Fetched campaigns:', campaignsData);
+      
   const campaigns = useMemo(() => {
-    const arr = data || [];
+    const arr = campaignsData || [];
     if (tab === 'active') return arr.filter((c) => c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'live');
     if (tab === 'completed') return arr.filter((c) => c.status?.toLowerCase() === 'completed');
     return arr.filter((c) => ['upcoming', 'scheduled'].includes(c.status?.toLowerCase()));
-  }, [data, tab]);
+  }, [campaignsData, tab]);
 
   // Create Campaign: lasciamo un bottone che chiama l'API (se non esiste ti dirà cosa manca)
   const createCampaign = useMutation((payload: Partial<Campaign>) => campaignsAPI.create(payload));
