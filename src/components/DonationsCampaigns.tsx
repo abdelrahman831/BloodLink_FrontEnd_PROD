@@ -9,12 +9,13 @@ import { campaignsAPI } from '../services/api';
 
 type Campaign = {
   id: number;
-  name: string;
-  location?: string;
-  startTime?: string;
-  endTime?: string;
+  title: string;
+  locationCity?: string;
+  startDate?: string;
+  endDate?: string;
   status: 'active' | 'completed' | 'upcoming' | 'scheduled' | string;
-  donorsCount?: number;
+  possibleDonorsCount?: number;
+  hospitalId?: number;
   unitsCollected?: number;
   bloodTypesCollected?: string[];
   eligiblePercent?: number;
@@ -32,7 +33,9 @@ function statusBadge(status: string) {
 export function DonationsCampaigns() {
   const [tab, setTab] = useState<'active' | 'completed' | 'upcoming'>('active');
 
-  const { data, loading, error, refetch } = useAPI<Campaign[]>(() => campaignsAPI.getAll(), []);
+  let hospitalId = localStorage.getItem('hospitalId') || localStorage.setItem('hospitalId', '1'); // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
+
+  const { data, loading, error, refetch } = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId), []);
 
   const campaigns = useMemo(() => {
     const arr = data || [];
