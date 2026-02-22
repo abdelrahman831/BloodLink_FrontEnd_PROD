@@ -44,10 +44,9 @@ export function DonationsCampaigns() {
   let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
   
 
-  // const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
+   const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
   
-  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation(() => campaignsAPI.getById(hospitalId));
-
+   
 
   console.log('Fetched campaigns:', campaignsData);
       
@@ -100,11 +99,11 @@ export function DonationsCampaigns() {
           </TabsList>
 
           <TabsContent value={tab} className="mt-4">
-            {campaignsLoading && <p className="text-sm text-gray-600">Caricamento…</p>}
-            {!campaignsLoading && campaignsData && campaignsData.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
+            {campaignsData.loading && <p className="text-sm text-gray-600">Caricamento…</p>}
+            {!campaignsData.loading && campaignsData.data && campaignsData.data.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {campaignsData?.map((c) => (
+              {campaignsData.data?.map((c) => (
                 <div key={c.id} className="p-4 border rounded-lg bg-white">
                   <div className="flex items-start justify-between gap-3">
                     <div>

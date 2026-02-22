@@ -120,6 +120,8 @@ export const hospitalsAPI = {
 
 // Donations & Campaigns APIs
 export const campaignsAPI = {
+
+
   getAll: () => apiCall('/campaigns'),
         getById: (id: any) => apiCall(`/Campaigns/Hospital/${id}`),
   create: (data: any) => 
