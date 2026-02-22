@@ -47,16 +47,16 @@ export function useAPI<T>(
  * const { mutate, loading, error } = useMutation(apiFunction);
  */
 
-interface UseMutationResult<T, P> {
-  mutate: (params: P) => Promise<T | null>;
+interface UseMutationResult<T> {
+  mutate: (id: any, hospitalId: any) => Promise<T | null>;
   loading: boolean;
   error: Error | null;
   data: T | null;
 }
 
-export function useMutation<T, P>(
+export function useMutation<T>(
   apiFunction: (id: any, hospitalId: any) => Promise<T>
-): UseMutationResult<T, P> {
+): UseMutationResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);

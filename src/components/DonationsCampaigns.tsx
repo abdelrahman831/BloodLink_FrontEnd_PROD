@@ -46,7 +46,7 @@ export function DonationsCampaigns() {
 
   // const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
   
-  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation(() => campaignsAPI.getById(hospitalId));
+  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
 
 
   console.log('Fetched campaigns:', campaignsData);
@@ -104,7 +104,7 @@ export function DonationsCampaigns() {
             {!campaignsLoading && campaignsData && campaignsData.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {campaignsData.map((c) => (
+              {campaignsData?.map((c) => (
                 <div key={c.id} className="p-4 border rounded-lg bg-white">
                   <div className="flex items-start justify-between gap-3">
                     <div>
