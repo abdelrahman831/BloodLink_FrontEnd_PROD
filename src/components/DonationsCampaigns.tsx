@@ -44,7 +44,7 @@ export function DonationsCampaigns() {
   let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
   
 
-   const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
+   const  campaignsData = useMutation(() => campaignsAPI.getById(hospitalId));
   
    
 
