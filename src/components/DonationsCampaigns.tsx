@@ -30,23 +30,33 @@ function statusBadge(status: string) {
   return <Badge variant="outline">{status}</Badge>;
 }
 
+function refetch() {
+  // Placeholder: questa funzione dovrebbe triggerare un refetch dei dati dopo la creazione o modifica di una campagna.
+  // Con useAPI, potresti esporre una funzione di refetch direttamente dal hook e chiamarla qui.
+  // Per ora, è solo un segnaposto per indicare dove dovrebbe avvenire il refetch.
+  console.log('Refetching campaigns data...');
+}
+
+
 export function DonationsCampaigns() {
   const [tab, setTab] = useState<'active' | 'completed' | 'upcoming'>('active');
 
   let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
   
 
+  // const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
   
-  const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
-  
+  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation(() => campaignsAPI.getById(hospitalId));
+
+
   console.log('Fetched campaigns:', campaignsData);
       
-  const campaigns = useMemo(() => {
-    const arr = campaignsData || [];
-    if (tab === 'active') return arr.filter((c) => c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'live');
-    if (tab === 'completed') return arr.filter((c) => c.status?.toLowerCase() === 'completed');
-    return arr.filter((c) => ['upcoming', 'scheduled'].includes(c.status?.toLowerCase()));
-  }, [campaignsData, tab]);
+  // const campaigns = useMemo(() => {
+  //   const arr = campaignsData || [];
+  //   if (tab === 'active') return arr.filter((c) => c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'live');
+  //   if (tab === 'completed') return arr.filter((c) => c.status?.toLowerCase() === 'completed');
+  //   return arr.filter((c) => ['upcoming', 'scheduled'].includes(c.status?.toLowerCase()));
+  // }, [campaignsData, tab]);
 
   // Create Campaign: lasciamo un bottone che chiama l'API (se non esiste ti dirà cosa manca)
   const createCampaign = useMutation((payload: Partial<Campaign>) => campaignsAPI.create(payload));
@@ -75,9 +85,9 @@ export function DonationsCampaigns() {
         </Button>
       </div>
 
-      {(error || createCampaign.error) && (
+      {(createCampaign.error) && (
         <Card className="p-4 border border-red-200 bg-red-50">
-          <p className="text-sm text-red-700">Errore API: {(error || createCampaign.error)?.message}</p>
+          <p className="text-sm text-red-700">Errore API: {(createCampaign.error as any )?.message}</p>
         </Card>
       )}
 
@@ -90,11 +100,11 @@ export function DonationsCampaigns() {
           </TabsList>
 
           <TabsContent value={tab} className="mt-4">
-            {loading && <p className="text-sm text-gray-600">Caricamento…</p>}
-            {!loading && campaigns.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
+            {campaignsLoading && <p className="text-sm text-gray-600">Caricamento…</p>}
+            {!campaignsLoading && campaignsData && campaignsData.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {campaigns.map((c) => (
+              {campaignsData.map((c) => (
                 <div key={c.id} className="p-4 border rounded-lg bg-white">
                   <div className="flex items-start justify-between gap-3">
                     <div>
