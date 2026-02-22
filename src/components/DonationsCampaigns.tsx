@@ -46,7 +46,7 @@ export function DonationsCampaigns() {
 
   // const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
   
-  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
+  const {data: campaignsData, error: campaignsError, loading: campaignsLoading} = useMutation(() => campaignsAPI.getById(hospitalId));
 
 
   console.log('Fetched campaigns:', campaignsData);
@@ -61,12 +61,12 @@ export function DonationsCampaigns() {
   // Create Campaign: lasciamo un bottone che chiama l'API (se non esiste ti dirà cosa manca)
   const createCampaign = useMutation((payload: Partial<Campaign>) => campaignsAPI.create(payload));
 
-  const onQuickCreate = async () => {
-    // Niente dummy mostrato a schermo: questa è solo una chiamata per verificare se l'endpoint esiste.
-    // Quando mi passi le tue API, lo allineiamo alla tua struttura (campi obbligatori).
-    await createCampaign.mutate({ name: 'New Campaign', status: 'scheduled' } as any);
-    refetch();
-  };
+  // const onQuickCreate = async () => {
+  //   // Niente dummy mostrato a schermo: questa è solo una chiamata per verificare se l'endpoint esiste.
+  //   // Quando mi passi le tue API, lo allineiamo alla tua struttura (campi obbligatori).
+  //   await createCampaign.mutate({ name: 'New Campaign', status: 'scheduled' } as any);
+  //   refetch();
+  // };
 
   return (
     <div className="space-y-6">
