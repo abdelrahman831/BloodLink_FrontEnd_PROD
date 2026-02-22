@@ -37,7 +37,7 @@ export function DonationsCampaigns() {
   
 
   
-  const { data: campaignsData, loading, error } = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
+  const  campaignsData = useMutation((payload: Campaign[]) => campaignsAPI.getById(hospitalId));
   
   console.log('Fetched campaigns:', campaignsData);
       
