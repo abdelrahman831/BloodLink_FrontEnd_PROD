@@ -91,7 +91,7 @@ export function DonationsCampaigns() {
       )}
 
       <Card className="p-6 shadow-xl">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+        <Tabs value={tab}>
           <TabsList>
             <TabsTrigger value="active">Active</TabsTrigger>
             <TabsTrigger value="completed">Completed</TabsTrigger>
