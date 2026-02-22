@@ -118,12 +118,26 @@ export const hospitalsAPI = {
     }),
 };
 
+type Campaign = {
+  id: number;
+  title: string;
+  locationCity?: string;
+  startDate?: string;
+  endDate?: string;
+  status: 'active' | 'completed' | 'upcoming' | 'scheduled' | string;
+  possibleDonorsCount?: number;
+  hospitalId?: number;
+  unitsCollected?: number;
+  bloodTypesCollected?: string[];
+  eligiblePercent?: number;
+  avgWaitMinutes?: number;
+};
 // Donations & Campaigns APIs
 export const campaignsAPI = {
 
 
   getAll: () => apiCall('/campaigns'),
-        getById: (id: any) => apiCall(`/Campaigns/Hospital/${id}`),
+        getById: (id: any) => apiCall(`/Campaigns/Hospital/${id}`) as Promise<Campaign[]>,
   create: (data: any) => 
     apiCall('/campaigns', {
       method: 'POST',

@@ -44,7 +44,7 @@ export function DonationsCampaigns() {
   let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
   
 
-   const  campaignsData = useMutation(() => campaignsAPI.getById(hospitalId));
+   const  campaignsData = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId));
   
    
 
@@ -99,7 +99,7 @@ export function DonationsCampaigns() {
           </TabsList>
 
           <TabsContent value={tab} className="mt-4">
-            {campaignsData.loading && <p className="text-sm text-gray-600">Caricamento…</p>}
+            {campaignsData.loading && <p className="text-sm text-gray-600">Loading...</p>}
             {!campaignsData.loading && campaignsData.data && campaignsData.data.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -107,27 +107,27 @@ export function DonationsCampaigns() {
                 <div key={c.id} className="p-4 border rounded-lg bg-white">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="font-bold text-lg">{c.name}</h3>
-                      <p className="text-sm text-gray-600">{c.location || '—'}</p>
+                      <h3 className="font-bold text-lg">{c.title}</h3>
+                      <p className="text-sm text-gray-600">{c.locationCity || '—'}</p>
                     </div>
                     {statusBadge(c.status)}
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-gray-500">Donatori</p>
-                      <p className="font-semibold">{c.donorsCount ?? '—'}</p>
+                      <p className="text-gray-500">Donors</p>
+                      <p className="font-semibold">{c.possibleDonorsCount ?? '—'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Unità raccolte</p>
+                      <p className="text-gray-500">Units collected</p>
                       <p className="font-semibold">{c.unitsCollected ?? '—'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Idonei</p>
+                      <p className="text-gray-500">Eligible %</p>
                       <p className="font-semibold">{c.eligiblePercent != null ? `${c.eligiblePercent}%` : '—'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Attesa media</p>
+                      <p className="text-gray-500">Average wait time</p>
                       <p className="font-semibold">{c.avgWaitMinutes != null ? `${c.avgWaitMinutes} min` : '—'}</p>
                     </div>
                   </div>
