@@ -22,13 +22,13 @@ type Campaign = {
   avgWaitMinutes?: number;
 };
 
-function statusBadge(status: string) {
-  const s = status.toLowerCase();
-  if (s === 'active' || s === 'live') return <Badge className="bg-green-100 text-green-700">Active</Badge>;
-  if (s === 'completed') return <Badge className="bg-gray-100 text-gray-700">Completed</Badge>;
-  if (s === 'upcoming' || s === 'scheduled') return <Badge className="bg-blue-100 text-blue-700">Upcoming</Badge>;
-  return <Badge variant="outline">{status}</Badge>;
-}
+// function statusBadge(status: string) {
+//   const s = status.toLowerCase();
+//   if (s === 'active' || s === 'live') return <Badge className="bg-green-100 text-green-700">Active</Badge>;
+//   if (s === 'completed') return <Badge className="bg-gray-100 text-gray-700">Completed</Badge>;
+//   if (s === 'upcoming' || s === 'scheduled') return <Badge className="bg-blue-100 text-blue-700">Upcoming</Badge>;
+//   return <Badge variant="outline">{status}</Badge>;
+// }
 
 function refetch() {
   // Placeholder: questa funzione dovrebbe triggerare un refetch dei dati dopo la creazione o modifica di una campagna.
@@ -110,7 +110,7 @@ export function DonationsCampaigns() {
                       <h3 className="font-bold text-lg">{c.title}</h3>
                       <p className="text-sm text-gray-600">{c.locationCity || '—'}</p>
                     </div>
-                    {statusBadge(c.status)}
+                    {/* {statusBadge(c.status)} */}
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
