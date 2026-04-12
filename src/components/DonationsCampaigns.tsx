@@ -29,7 +29,7 @@ type CampaignCreateDto = {
   StartDate: string;
   EndDate: string;
   Description: string;
-  BloodType?: string[];
+  BloodType?: number[];
   HospitalId: string;
 };
 
@@ -53,15 +53,15 @@ export function DonationsCampaigns() {
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  const bloodTypeToEnum: Record<string, string> = {
-    'O+': 'O_p',
-    'O-': 'O_n',
-    'A+': 'A_p',
-    'A-': 'A_n',
-    'B+': 'B_p',
-    'B-': 'B_n',
-    'AB+': 'AB_p',
-    'AB-': 'AB_n',
+  const bloodTypeToEnum: Record<string, number> = {
+    'O+': 1,
+    'O-': 2,
+    'A+': 3,
+    'A-': 4,
+    'B+': 5,
+    'B-': 6,
+    'AB+': 7,
+    'AB-': 8,
   };
 
   const createCampaign = useMutation((payload: CampaignCreateDto) => campaignsAPI.create(payload));
@@ -70,7 +70,7 @@ export function DonationsCampaigns() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleBloodType = (type: string) => {
+  const toggleBloodType = (type: number) => {
     setFormData((prev) => {
       const current = prev.BloodType ?? [];
       return {
