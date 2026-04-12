@@ -48,26 +48,26 @@ export function useAPI<T>(
  */
 
 interface UseMutationResult<T> {
-  mutate: (id: any, hospitalId: any) => Promise<T | null>;
+  mutate: (...args: any[]) => Promise<T | null>;
   loading: boolean;
   error: Error | null;
   data: T | null;
 }
 
 export function useMutation<T>(
-  apiFunction: (id: any, hospitalId: any) => Promise<T>
+  apiFunction: (...args: any[]) => Promise<T>
 ): UseMutationResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const mutate = async (id: any, hospitalId: any): Promise<T | null> => {
+  const mutate = async (...args: any[]): Promise<T | null> => {
     try {
-      console.log("Mutation called with params:", hospitalId, id);
+      console.log('Mutation called with params:', ...args);
       
       setLoading(true);
       setError(null);
-      const result = await apiFunction(id,hospitalId);
+      const result = await apiFunction(...args);
       setData(result);
       return result;
     } catch (err) {

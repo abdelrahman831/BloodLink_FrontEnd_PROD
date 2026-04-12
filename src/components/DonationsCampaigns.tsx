@@ -22,31 +22,22 @@ type Campaign = {
   avgWaitMinutes?: number;
 };
 
-// function statusBadge(status: string) {
-//   const s = status.toLowerCase();
-//   if (s === 'active' || s === 'live') return <Badge className="bg-green-100 text-green-700">Active</Badge>;
-//   if (s === 'completed') return <Badge className="bg-gray-100 text-gray-700">Completed</Badge>;
-//   if (s === 'upcoming' || s === 'scheduled') return <Badge className="bg-blue-100 text-blue-700">Upcoming</Badge>;
-//   return <Badge variant="outline">{status}</Badge>;
-// }
-
-function refetch() {
-  // Placeholder: questa funzione dovrebbe triggerare un refetch dei dati dopo la creazione o modifica di una campagna.
-  // Con useAPI, potresti esporre una funzione di refetch direttamente dal hook e chiamarla qui.
-  // Per ora, è solo un segnaposto per indicare dove dovrebbe avvenire il refetch.
-  console.log('Refetching campaigns data...');
-}
-
+type CampaignCreateDto = {
+  Title: string;
+  LocationCity: string;
+  StartDate: string;
+  EndDate: string;
+  Description: string;
+  BloodType?: Array<string | null>;
+  HospitalId: string;
+};
 
 export function DonationsCampaigns() {
   const [tab, setTab] = useState<'active' | 'completed' | 'upcoming'>('active');
 
-  let hospitalId = localStorage.getItem('hospitalId') // Per testing, se non esiste lo settiamo a 1 (il tuo backend dovrebbe accettare questo ID o modificarlo in base alla tua implementazione)
-  
+  const hospitalId = localStorage.getItem('hospitalId') ?? '';
 
-   const  campaignsData = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId));
-  
-   
+  const campaignsData = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId));
 
   console.log('Fetched campaigns:', campaignsData);
       
@@ -57,14 +48,27 @@ export function DonationsCampaigns() {
   //   return arr.filter((c) => ['upcoming', 'scheduled'].includes(c.status?.toLowerCase()));
   // }, [campaignsData, tab]);
 
-  // Create Campaign: lasciamo un bottone che chiama l'API (se non esiste ti dirà cosa manca)
-  const createCampaign = useMutation((payload: Partial<Campaign>) => campaignsAPI.create(payload));
+  // Create Campaign: usiamo il DTO backend per inviare i campi corretti.
+  const createCampaign = useMutation((payload: CampaignCreateDto) => campaignsAPI.create(payload));
 
   const onQuickCreate = async () => {
-    // Niente dummy mostrato a schermo: questa è solo una chiamata per verificare se l'endpoint esiste.
-    // Quando mi passi le tue API, lo allineiamo alla tua struttura (campi obbligatori).
-    await createCampaign.mutate({ name: 'New Campaign', status: 'scheduled', hospitalId }, hospitalId);
-    refetch();
+    if (!hospitalId) {
+      console.error('Missing hospitalId, impossible creare la campagna.');
+      return;
+    }
+
+    const payload: CampaignCreateDto = {
+      Title: 'Donor Drive: Emergency Blood Mobile Unit',
+      LocationCity: 'Milano',
+      StartDate: new Date().toISOString(),
+      EndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      Description: 'Campagna di donazione sangue organizzata in partnership con l’ospedale locale.',
+      BloodType: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      HospitalId: hospitalId,
+    };
+
+    await createCampaign.mutate(payload);
+    campaignsData.refetch();
   };
 
   return (
