@@ -18,6 +18,10 @@ type RequestItem = {
   id: number;
   hospitalId: number;
   hospitalName?: string;
+  centerName?: string;
+  date?: string;
+  userName?: string;
+  phone?: string;
   bloodType: number;
   component?: string;
   units: number;
@@ -47,9 +51,9 @@ const [search, setSearch] = useState("");
 const [sortColumn, setSortColumn] = useState<string | null>(null);
 const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const { data: hospitals } = useAPI<Hospital[]>(() => hospitalsAPI.getAll(), []);
+  const { data: hospitals } = useAPI<Hospital[]>(() => hospitalsAPI.getAll<Hospital[]>(), []);
   const { data: requests, loading, error, refetch } = useAPI<RequestItem[]>(
-    () => hospitalsAPI.getRequests(),
+    () => hospitalsAPI.getRequests<RequestItem[]>(filters),
     [hospitalId, onlyUrgent]
   );
 
@@ -116,7 +120,7 @@ const filteredAndSorted = useMemo(() => {
   }, [hospitalId, onlyUrgent]);
 
   
-        const bloodTypeMap = {
+        const bloodTypeMap: Record<number, string> = {
         3 : 'A+', 4: 'A-', 5: 'B+', 6: 'B-',
         7: 'AB+', 8: 'AB-', 1: 'O+', 2: 'O-'
       };
@@ -220,7 +224,7 @@ const filteredAndSorted = useMemo(() => {
             {loading && (
               <TableRow>
                 <TableCell colSpan={8} className="text-sm text-gray-600">
-                  Caricamento…
+                  Loading…
                 </TableCell>
               </TableRow>
             )}
@@ -228,7 +232,7 @@ const filteredAndSorted = useMemo(() => {
             {!loading && (!requests || requests.length === 0) && (
               <TableRow>
                 <TableCell colSpan={8} className="text-sm text-gray-600">
-                  Nessuna richiesta.
+                  No requests.
                 </TableCell>
               </TableRow>
             )}
@@ -238,8 +242,8 @@ const filteredAndSorted = useMemo(() => {
              
              
                 <TableCell>{r.centerName}</TableCell>
-                <TableCell>{format(new Date(r.date),"dd/MM/yyyy")}</TableCell>
-                <TableCell>{bloodTypeMap[parseInt(r.bloodType)]}</TableCell>
+                <TableCell>{r.date ? format(new Date(r.date),"dd/MM/yyyy") : '—'}</TableCell>
+                <TableCell>{bloodTypeMap[r.bloodType]}</TableCell>
                 <TableCell>{r.userName || '—'}</TableCell>
                 <TableCell>{r.phone}</TableCell>
                 <TableCell>{statusBadge(r.status)}</TableCell>

@@ -189,7 +189,7 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
           <span>Dashboard Overview</span>
           <Droplet className="w-8 h-8 text-red-500" />
         </h1>
-        <p className="text-gray-600 mt-2">Panoramica live (solo dati da API)</p>
+        <p className="text-gray-600 mt-2">Live overview (API data only)</p>
       </div>
 
       {anyError && (
@@ -202,32 +202,32 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
       {/* KPI cards (allineati ai campi reali) */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Unità disponibili</p>
+          <p className="text-xs text-gray-600">Available units</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsAvailable ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Unità totali</p>
+          <p className="text-xs text-gray-600">Total units</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsTotal ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Scadenza vicina</p>
+          <p className="text-xs text-gray-600">Expiring soon</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.unitsExpiringSoon ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Richieste urgenti</p>
+          <p className="text-xs text-gray-600">Urgent requests</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.emergencyRequests ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Tempo risposta medio (h)</p>
+          <p className="text-xs text-gray-600">Average response time (h)</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.averageResponseTime ?? '—')}</p>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-gray-600">Carovane oggi</p>
+          <p className="text-xs text-gray-600">Campaigns today</p>
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.campainsToday ?? '—')}</p>
         </Card>
       </div>
@@ -237,7 +237,7 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <Search className="w-6 h-6 text-red-600" />
-            <h3 className="text-lg font-bold text-red-900">Filtra per gruppo sanguigno</h3>
+            <h3 className="text-lg font-bold text-red-900">Filter by blood type</h3>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -249,7 +249,7 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
                   : 'bg-white text-gray-700 hover:bg-red-100 border-2 border-gray-200'
               }`}
             >
-              Tutti
+              All
             </button>
 
             {bloodTypeOptions.map((type) => (
@@ -273,7 +273,7 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
                 <span className="font-bold text-red-700 text-lg">
                   {hospitalsLoading ? '…' : filteredHospitals.length}
                 </span>{' '}
-                strutture hanno{' '}
+                facilities have{' '}
                 <span className="font-bold text-red-800 text-lg">{selectedBloodType}</span>
               </p>
             </div>
@@ -342,9 +342,9 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
           <div className="rounded-xl overflow-hidden border bg-white">
             {!mapUrl ? (
               <div className="p-6">
-                <p className="text-sm text-gray-700 font-semibold">Mappa non configurata.</p>
+                <p className="text-sm text-gray-700 font-semibold">Map not configured.</p>
                 <p className="text-xs text-gray-600 mt-1">
-                  Aggiungi <code className="px-1 bg-gray-100 rounded">VITE_GOOGLE_MAPS_API_KEY</code> nel tuo{' '}
+                  Add <code className="px-1 bg-gray-100 rounded">VITE_GOOGLE_MAPS_API_KEY</code> to your{' '}
                   <code className="px-1 bg-gray-100 rounded">.env</code>.
                 </p>
               </div>

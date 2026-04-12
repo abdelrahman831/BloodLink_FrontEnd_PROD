@@ -33,13 +33,17 @@ type CampaignCreateDto = {
   HospitalId: string;
 };
 
+type CampaignFormState = Omit<CampaignCreateDto, 'BloodType'> & {
+  BloodType: string[];
+};
+
 export function DonationsCampaigns() {
   const [tab, setTab] = useState<'active' | 'completed' | 'upcoming'>('active');
 
   const hospitalId = localStorage.getItem('hospitalId') ?? '';
 
   const [successMessage, setSuccessMessage] = useState<string>('');
-  const [formData, setFormData] = useState<CampaignCreateDto>({
+  const [formData, setFormData] = useState<CampaignFormState>({
     Title: '',
     LocationCity: '',
     StartDate: new Date().toISOString().substring(0, 10),
@@ -70,7 +74,7 @@ export function DonationsCampaigns() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleBloodType = (type: number) => {
+  const toggleBloodType = (type: string) => {
     setFormData((prev) => {
       const current = prev.BloodType ?? [];
       return {
@@ -91,19 +95,21 @@ export function DonationsCampaigns() {
     }
 
     const payload: CampaignCreateDto = {
-      ...formData,
-      HospitalId: hospitalId,
+      Title: formData.Title,
+      LocationCity: formData.LocationCity,
       StartDate: new Date(formData.StartDate).toISOString(),
       EndDate: new Date(formData.EndDate).toISOString(),
+      Description: formData.Description,
       BloodType: formData.BloodType?.length
-        ? formData.BloodType.map((type) => bloodTypeToEnum[type] ?? 'None')
+        ? formData.BloodType.map((type) => bloodTypeToEnum[type] ?? 0)
         : undefined,
+      HospitalId: hospitalId,
     };
 
     const created = await createCampaign.mutate(payload);
 
     if (created) {
-      setSuccessMessage('Campagna creata con successo.');
+      setSuccessMessage('Campaign created successfully.');
       campaignsData.refetch();
       setFormData((prev) => ({
         ...prev,
@@ -125,30 +131,30 @@ export function DonationsCampaigns() {
             <Megaphone className="w-6 h-6 text-blue-600" />
             <span>Donations Campaigns & Mobile Units</span>
           </h1>
-          <p className="text-gray-600 mt-1">Gestione carovane (dati da API)</p>
+          <p className="text-gray-600 mt-1">Manage mobile units and campaigns (API data)</p>
         </div>
 
       </div>
 
       <Card className="p-6 shadow-xl">
-        <h2 className="text-xl font-semibold mb-4">Crea nuova campagna</h2>
+        <h2 className="text-xl font-semibold mb-4">Create new campaign</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <label className="space-y-2">
-              <span className="text-sm font-medium">Titolo</span>
+              <span className="text-sm font-medium">Title</span>
               <Input
                 value={formData.Title}
                 onChange={(event) => handleFormChange('Title', event.target.value)}
-                placeholder="Nome campagna"
+                placeholder="Campaign name"
                 required
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-medium">Città</span>
+              <span className="text-sm font-medium">City</span>
               <Input
                 value={formData.LocationCity}
                 onChange={(event) => handleFormChange('LocationCity', event.target.value)}
-                placeholder="Milano"
+                placeholder="Milan"
                 required
               />
             </label>
@@ -156,7 +162,7 @@ export function DonationsCampaigns() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <label className="space-y-2">
-              <span className="text-sm font-medium">Data inizio</span>
+              <span className="text-sm font-medium">Start date</span>
               <Input
                 type="date"
                 value={formData.StartDate}
@@ -165,7 +171,7 @@ export function DonationsCampaigns() {
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-medium">Data fine</span>
+              <span className="text-sm font-medium">End date</span>
               <Input
                 type="date"
                 value={formData.EndDate}
@@ -176,17 +182,17 @@ export function DonationsCampaigns() {
           </div>
 
           <label className="space-y-2">
-            <span className="text-sm font-medium">Descrizione</span>
+            <span className="text-sm font-medium">Description</span>
             <Textarea
               value={formData.Description}
               onChange={(event) => handleFormChange('Description', event.target.value)}
-              placeholder="Descrivi brevemente la campagna"
+              placeholder="Briefly describe the campaign"
               required
             />
           </label>
 
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium">Tipi di sangue</legend>
+            <legend className="text-sm font-medium">Blood types</legend>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {bloodTypes.map((type) => (
                 <label key={type} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
@@ -204,13 +210,13 @@ export function DonationsCampaigns() {
 
           <div className="flex flex-col gap-3">
             <Button type="submit" disabled={createCampaign.loading || !hospitalId}>
-              {createCampaign.loading ? 'Creazione…' : 'Crea campagna'}
+              {createCampaign.loading ? 'Creating…' : 'Create campaign'}
             </Button>
             {successMessage ? (
               <p className="text-sm text-green-700">{successMessage}</p>
             ) : null}
             {!hospitalId ? (
-              <p className="text-sm text-orange-600">HospitalId mancante. Verifica le impostazioni di autenticazione.</p>
+              <p className="text-sm text-orange-600">Missing hospitalId. Check authentication settings.</p>
             ) : null}
           </div>
         </form>
@@ -218,7 +224,7 @@ export function DonationsCampaigns() {
 
       {(createCampaign.error) && (
         <Card className="p-4 border border-red-200 bg-red-50">
-          <p className="text-sm text-red-700">Errore API: {(createCampaign.error as any )?.message}</p>
+          <p className="text-sm text-red-700">API Error: {(createCampaign.error as any )?.message}</p>
         </Card>
       )}
 
@@ -232,7 +238,7 @@ export function DonationsCampaigns() {
 
           <TabsContent value={tab} className="mt-4">
             {campaignsData.loading && <p className="text-sm text-gray-600">Loading...</p>}
-            {!campaignsData.loading && campaignsData.data && campaignsData.data.length === 0 && <p className="text-sm text-gray-600">Nessuna campagna trovata.</p>}
+            {!campaignsData.loading && campaignsData.data && campaignsData.data.length === 0 && <p className="text-sm text-gray-600">No campaigns found.</p>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {campaignsData.data?.map((c) => (

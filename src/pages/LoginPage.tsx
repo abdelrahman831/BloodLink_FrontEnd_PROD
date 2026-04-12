@@ -21,7 +21,7 @@ export function LoginPage() {
       
       // atteso: { token: string } (se nel tuo backend è diverso, lo adatteremo quando mi passi le API)
       const token = res?.token;
-      if (!token) throw new Error('Login riuscito ma token mancante nella risposta.');
+      if (!token) throw new Error('Login succeeded but token is missing from response.');
       localStorage.setItem('auth_token', token);
       localStorage.setItem('hospitalId',(res as any).hospitalId ||'');
       console.log('Login riuscito, token salvato in localStorage.');
@@ -38,7 +38,7 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <Card className="w-full max-w-md p-6">
         <h1 className="text-2xl font-bold">Admin Login</h1>
-        <p className="text-gray-600 mt-1">Accedi con credenziali ufficiali</p>
+        <p className="text-gray-600 mt-1">Log in with official credentials</p>
 
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <div className="space-y-2">
@@ -59,12 +59,12 @@ export function LoginPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button className="w-full" disabled={loading} type="submit">
-            {loading ? 'Accesso in corso…' : 'Accedi'}
+            {loading ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
 
         <p className="text-xs text-gray-500 mt-4">
-          Nota: nessun dato è “dummy”. Se il login fallisce, probabilmente manca l’endpoint o la forma della risposta è diversa.
+          Note: no data is dummy. If login fails, the endpoint may be missing or the response format may differ.
         </p>
       </Card>
     </div>

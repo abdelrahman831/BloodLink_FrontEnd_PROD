@@ -102,10 +102,10 @@ export const inventoryAPI = {
 
 // Hospitals & Requests APIs
 export const hospitalsAPI = {
-  getAll: () => apiCall('/hospitals'),
-  getRequests: (filters?: any) => {
+  getAll: <T = any>() => apiCall<T>('/hospitals'),
+  getRequests: <T = any>(filters?: any) => {
     const queryParams = filters ? `?${new URLSearchParams(filters)}` : '';
-    return apiCall(`/Appointments/Hospital${queryParams}`);
+    return apiCall<T>(`/Appointments/Hospital${queryParams}`);
   },
   approveRequest: (id: any, hospitalId: any) => 
     apiCall(`/Appointments/${id}/accept`, {

@@ -13,6 +13,7 @@ type InventoryItem = {
   expiringSoon?: number;
   averageDemand?: number;
   status?: string;
+  fillPercentage?: number;
 };
 
 
@@ -74,9 +75,9 @@ export function BloodInventory() {
       try {
         if (!hospitalId) {
           setData([]);
-          setDataStats([]);
+          setDataStats(null);
 
-          setError("hospitalId mancante in localStorage. Salvalo dopo il login (localStorage.setItem('hospitalId', ...)).");
+          setError("Missing hospitalId in localStorage. Save it after login (localStorage.setItem('hospitalId', ...)).");
           return;
         }
   console.log('BloodInventory hospitalId from localStorage:', hospitalId);
@@ -97,7 +98,7 @@ export function BloodInventory() {
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || String(e));
-          setDataStats([]);
+          setDataStats(null);
           setData([]);
         }
       } finally {
@@ -190,8 +191,8 @@ const totalExpiring = dataStats?.expiringSoon ?? 0;
       <Card className="p-6 shadow-xl">
         <h3 className="text-xl font-bold mb-4">Inventory</h3>
 
-        {loading && <p className="text-sm text-gray-600">Caricamento…</p>}
-        {!loading && (!data || data.length === 0) && <p className="text-sm text-gray-600">Nessun dato disponibile.</p>}
+        {loading && <p className="text-sm text-gray-600">Loading…</p>}
+        {!loading && (!data || data.length === 0) && <p className="text-sm text-gray-600">No data available.</p>}
 
         {!!data?.length && (
           <div className="overflow-auto">
