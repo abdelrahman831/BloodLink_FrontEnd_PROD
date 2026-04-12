@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Card } from './ui/card';
-import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Megaphone, Plus } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
 import { useAPI, useMutation } from '../hooks/useAPI';
 import { campaignsAPI } from '../services/api';
 
@@ -28,7 +29,7 @@ type CampaignCreateDto = {
   StartDate: string;
   EndDate: string;
   Description: string;
-  BloodType?: Array<string | null>;
+  BloodType?: string[];
   HospitalId: string;
 };
 
@@ -37,39 +38,84 @@ export function DonationsCampaigns() {
 
   const hospitalId = localStorage.getItem('hospitalId') ?? '';
 
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [formData, setFormData] = useState<CampaignCreateDto>({
+    Title: '',
+    LocationCity: '',
+    StartDate: new Date().toISOString().substring(0, 10),
+    EndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().substring(0, 10),
+    Description: '',
+    BloodType: [],
+    HospitalId: hospitalId,
+  });
+
   const campaignsData = useAPI<Campaign[]>(() => campaignsAPI.getById(hospitalId));
 
-  console.log('Fetched campaigns:', campaignsData);
-      
-  // const campaigns = useMemo(() => {
-  //   const arr = campaignsData || [];
-  //   if (tab === 'active') return arr.filter((c) => c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'live');
-  //   if (tab === 'completed') return arr.filter((c) => c.status?.toLowerCase() === 'completed');
-  //   return arr.filter((c) => ['upcoming', 'scheduled'].includes(c.status?.toLowerCase()));
-  // }, [campaignsData, tab]);
+  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  // Create Campaign: usiamo il DTO backend per inviare i campi corretti.
+  const bloodTypeToEnum: Record<string, string> = {
+    'O+': 'O_p',
+    'O-': 'O_n',
+    'A+': 'A_p',
+    'A-': 'A_n',
+    'B+': 'B_p',
+    'B-': 'B_n',
+    'AB+': 'AB_p',
+    'AB-': 'AB_n',
+  };
+
   const createCampaign = useMutation((payload: CampaignCreateDto) => campaignsAPI.create(payload));
 
-  const onQuickCreate = async () => {
+  const handleFormChange = (field: keyof Omit<CampaignCreateDto, 'BloodType' | 'HospitalId'>, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleBloodType = (type: string) => {
+    setFormData((prev) => {
+      const current = prev.BloodType ?? [];
+      return {
+        ...prev,
+        BloodType: current.includes(type)
+          ? current.filter((item) => item !== type)
+          : [...current, type],
+      };
+    });
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSuccessMessage('');
+
     if (!hospitalId) {
-      console.error('Missing hospitalId, impossible creare la campagna.');
       return;
     }
 
     const payload: CampaignCreateDto = {
-      Title: 'Donor Drive: Emergency Blood Mobile Unit',
-      LocationCity: 'Milano',
-      StartDate: new Date().toISOString(),
-      EndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      Description: 'Campagna di donazione sangue organizzata in partnership con l’ospedale locale.',
-      BloodType: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      ...formData,
       HospitalId: hospitalId,
+      StartDate: new Date(formData.StartDate).toISOString(),
+      EndDate: new Date(formData.EndDate).toISOString(),
+      BloodType: formData.BloodType?.length
+        ? formData.BloodType.map((type) => bloodTypeToEnum[type] ?? 'None')
+        : undefined,
     };
 
-    await createCampaign.mutate(payload);
-    campaignsData.refetch();
+    const created = await createCampaign.mutate(payload);
+
+    if (created) {
+      setSuccessMessage('Campagna creata con successo.');
+      campaignsData.refetch();
+      setFormData((prev) => ({
+        ...prev,
+        Title: '',
+        LocationCity: '',
+        Description: '',
+        BloodType: [],
+      }));
+    }
   };
+
+  console.log('Fetched campaigns:', campaignsData);
 
   return (
     <div className="space-y-6">
@@ -82,11 +128,93 @@ export function DonationsCampaigns() {
           <p className="text-gray-600 mt-1">Gestione carovane (dati da API)</p>
         </div>
 
-        <Button onClick={onQuickCreate} disabled={createCampaign.loading}>
-          <Plus className="w-4 h-4 mr-2" />
-          {createCampaign.loading ? 'Creazione…' : 'Create Campaign (test endpoint)'}
-        </Button>
       </div>
+
+      <Card className="p-6 shadow-xl">
+        <h2 className="text-xl font-semibold mb-4">Crea nuova campagna</h2>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Titolo</span>
+              <Input
+                value={formData.Title}
+                onChange={(event) => handleFormChange('Title', event.target.value)}
+                placeholder="Nome campagna"
+                required
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Città</span>
+              <Input
+                value={formData.LocationCity}
+                onChange={(event) => handleFormChange('LocationCity', event.target.value)}
+                placeholder="Milano"
+                required
+              />
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Data inizio</span>
+              <Input
+                type="date"
+                value={formData.StartDate}
+                onChange={(event) => handleFormChange('StartDate', event.target.value)}
+                required
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Data fine</span>
+              <Input
+                type="date"
+                value={formData.EndDate}
+                onChange={(event) => handleFormChange('EndDate', event.target.value)}
+                required
+              />
+            </label>
+          </div>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Descrizione</span>
+            <Textarea
+              value={formData.Description}
+              onChange={(event) => handleFormChange('Description', event.target.value)}
+              placeholder="Descrivi brevemente la campagna"
+              required
+            />
+          </label>
+
+          <fieldset className="space-y-3">
+            <legend className="text-sm font-medium">Tipi di sangue</legend>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {bloodTypes.map((type) => (
+                <label key={type} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={formData.BloodType?.includes(type) ?? false}
+                    onChange={() => toggleBloodType(type)}
+                    className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                  />
+                  <span>{type}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={createCampaign.loading || !hospitalId}>
+              {createCampaign.loading ? 'Creazione…' : 'Crea campagna'}
+            </Button>
+            {successMessage ? (
+              <p className="text-sm text-green-700">{successMessage}</p>
+            ) : null}
+            {!hospitalId ? (
+              <p className="text-sm text-orange-600">HospitalId mancante. Verifica le impostazioni di autenticazione.</p>
+            ) : null}
+          </div>
+        </form>
+      </Card>
 
       {(createCampaign.error) && (
         <Card className="p-4 border border-red-200 bg-red-50">
