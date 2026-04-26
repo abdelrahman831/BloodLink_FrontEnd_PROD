@@ -197,6 +197,9 @@ const filteredAndSorted = useMemo(() => {
              <TableHead onClick={() => handleSort("centerName")} className="cursor-pointer">
   CenterName
 </TableHead>
+<TableHead onClick={() => handleSort("createdAt")} className="cursor-pointer">
+  Created At
+</TableHead>
 
 <TableHead onClick={() => handleSort("date")} className="cursor-pointer">
   Date
@@ -242,6 +245,7 @@ const filteredAndSorted = useMemo(() => {
              
              
                 <TableCell>{r.centerName}</TableCell>
+                <TableCell>{r.createdAt ? format(new Date(r.createdAt), "dd/MM/yyyy") : '—'}</TableCell>
                 <TableCell>{r.date ? format(new Date(r.date),"dd/MM/yyyy") : '—'}</TableCell>
                 <TableCell>{bloodTypeMap[r.bloodType]}</TableCell>
                 <TableCell>{r.userName || '—'}</TableCell>
