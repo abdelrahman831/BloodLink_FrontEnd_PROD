@@ -54,6 +54,7 @@ type HospitalItem = {
 
 const bloodTypeOptions = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
+const userType = 2; // 1 per admin, 2 per ospedale, 3 per donatore
 function StatusPill({ status }: { status?: string }) {
   const s = (status || '').toLowerCase();
   if (s === 'adequate' || s === 'safe')
@@ -231,8 +232,8 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
           <p className="text-2xl font-bold mt-1">{statsLoading ? '…' : (stats?.campainsToday ?? '—')}</p>
         </Card>
       </div>
-
-      {/* Blood type filter */}
+      
+{/*
       <Card className="p-6 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 shadow-lg">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
@@ -281,7 +282,6 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
         </div>
       </Card>
 
-      {/* Map + hospitals */}
       <Card className="p-6 shadow-xl">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h3 className="text-xl font-bold flex items-center gap-2">
@@ -363,7 +363,7 @@ return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${selected?.lati
           </div>
         </div>
       </Card>
-
+*/}
       {/* Trends
       <Card className="p-6 shadow-xl">
         <div className="flex items-center justify-between mb-4">
