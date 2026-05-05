@@ -28,7 +28,7 @@ function statusBadge(status: string) {
 }
 
 export function TransfersLogistics() {
-  const { data, loading, error, refetch } = useAPI<Transfer[]>(() => transfersAPI.getForHospital(localStorage.getItem('hospitalId') || ''), []);
+  const { data, loading, error, refetch } = useAPI<Transfer[]>(() => transfersAPI.getFromHospital(localStorage.getItem('hospitalId') || ''), []);
 
   const updateStatus = useMutation((params: { id: string; status: string }) =>
     transfersAPI.updateStatus(params.id, params.status)

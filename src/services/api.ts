@@ -168,8 +168,8 @@ export const campaignsAPI = {
 
 // Transfers & Logistics APIs
 export const transfersAPI = {
-  getForHospital: (id: string) => apiCall(`/Transfers/get-transfers-for-hospital/${id}`) as Promise<Transfer[]>,
-  getById: (id: string) => apiCall(`/Transfers/get-transfers-for-hospital/${id}`),
+  getFromHospital: (id: string) => apiCall(`/Transfers/get-transfers-from-hospital/${id}`) as Promise<Transfer[]>,
+  getToHospital: (id: string) => apiCall(`/Transfers/get-transfers-to-hospital/${id}`) as Promise<Transfer[]>,
   create: (data: any) => 
     apiCall('/transfers', {
       method: 'POST',
