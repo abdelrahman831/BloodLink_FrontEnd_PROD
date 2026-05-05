@@ -134,15 +134,14 @@ type Campaign = {
 };
 
 type Transfer = {
-  id: string;
-  from?: string;
-  to?: string;
-  bloodType?: string;
+  fromHospital?: string;
+  toHospital?: string;
+  bloodType?: number;
   component?: string;
-  units?: number;
-  status: string; // In Transit | Delayed | Delivered ...
-  temperature?: number;
+  totalUnits?: number;
+  status: number; // In Transit | Delayed | Delivered ...
   updatedAt?: string;
+  magazine?:boolean;
 };
 // Donations & Campaigns APIs
 export const campaignsAPI = {

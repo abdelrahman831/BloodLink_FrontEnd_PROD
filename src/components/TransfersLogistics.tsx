@@ -8,22 +8,28 @@ import { useAPI, useMutation } from '../hooks/useAPI';
 import { transfersAPI } from '../services/api';
 
 type Transfer = {
-  id: string;
-  from?: string;
-  to?: string;
-  bloodType?: string;
+  fromHospital?: string;
+  toHospital?: string;
+  bloodType?: number;
   component?: string;
-  units?: number;
-  status: string; // In Transit | Delayed | Delivered ...
-  temperature?: number;
+  totalUnits?: number;
+  status: number; // In Transit | Delayed | Delivered ...
   updatedAt?: string;
+  magazine?:boolean;
 };
+        const bloodTypeMap: Record<number, string> = {
+        3 : 'A+', 4: 'A-', 5: 'B+', 6: 'B-',
+        7: 'AB+', 8: 'AB-', 1: 'O+', 2: 'O-'
+      };
 
-function statusBadge(status: string) {
-  const s = status.toLowerCase();
-  if (s.includes('delivered')) return <Badge className="bg-green-100 text-green-700">Delivered</Badge>;
-  if (s.includes('delayed')) return <Badge className="bg-red-100 text-red-700">Delayed</Badge>;
-  if (s.includes('transit')) return <Badge className="bg-yellow-100 text-yellow-700">In Transit</Badge>;
+function statusBadge(status: number) {
+  const s = status;
+  if (s === 0) return <Badge className="bg-green-100 text-green-700">Available</Badge>;
+  if (s === 1) return <Badge className="bg-red-100 text-red-700">Transferring</Badge>;
+  if (s === 2) return <Badge className="bg-yellow-100 text-yellow-700">Reserved</Badge>;
+  if (s === 3) return <Badge className="bg-blue-100 text-blue-700">Transfused</Badge>;
+  if (s === 4) return <Badge className="bg-gray-100 text-gray-700">Expired</Badge>;
+  if (s === 5) return <Badge className="bg-red-100 text-red-700">Discarded</Badge>;
   return <Badge variant="outline">{status}</Badge>;
 }
 
@@ -71,13 +77,11 @@ export function TransfersLogistics() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>From</TableHead>
                 <TableHead>To</TableHead>
                 <TableHead>Blood</TableHead>
                 <TableHead>Units</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Temp (°C)</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -101,14 +105,13 @@ export function TransfersLogistics() {
               {(data || []).map((t) => (
                 <TableRow key={t.id}>
                   <TableCell className="font-mono text-xs">{t.id}</TableCell>
-                  <TableCell>{t.from || '—'}</TableCell>
-                  <TableCell>{t.to || '—'}</TableCell>
+                  <TableCell>{t.fromHospital || '—'}</TableCell>
+                  <TableCell>{t.toHospital || '—'}</TableCell>
                   <TableCell>
-                    {t.bloodType ? `${t.bloodType}${t.component ? ` • ${t.component}` : ''}` : '—'}
+                    {t.bloodType ? `${bloodTypeMap[t.bloodType]}${t.component ? ` • ${t.component}` : ''}` : '—'}
                   </TableCell>
-                  <TableCell>{typeof t.units === 'number' ? t.units : '—'}</TableCell>
+                  <TableCell>{typeof t.totalUnits === 'number' ? t.totalUnits : '—'}</TableCell>
                   <TableCell>{statusBadge(t.status)}</TableCell>
-                  <TableCell>{typeof t.temperature === 'number' ? t.temperature : '—'}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button
                       size="sm"
