@@ -157,7 +157,7 @@ export const campaignsAPI = {
 // Transfers & Logistics APIs
 export const transfersAPI = {
   getAll: () => apiCall('/transfers'),
-  getById: (id: string) => apiCall(`/transfers/${id}`),
+  getById: (id: string) => apiCall(`/Transfers/get-transfers-for-hospital/${id}`),
   create: (data: any) => 
     apiCall('/transfers', {
       method: 'POST',
