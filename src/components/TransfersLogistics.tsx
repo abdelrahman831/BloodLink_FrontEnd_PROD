@@ -82,7 +82,6 @@ export function TransfersLogistics() {
                 <TableHead>Blood</TableHead>
                 <TableHead>Units</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -104,7 +103,6 @@ export function TransfersLogistics() {
 
               {(data || []).map((t) => (
                 <TableRow key={t.id}>
-                  <TableCell className="font-mono text-xs">{t.id}</TableCell>
                   <TableCell>{t.fromHospital || '—'}</TableCell>
                   <TableCell>{t.toHospital || '—'}</TableCell>
                   <TableCell>
@@ -112,32 +110,7 @@ export function TransfersLogistics() {
                   </TableCell>
                   <TableCell>{typeof t.totalUnits === 'number' ? t.totalUnits : '—'}</TableCell>
                   <TableCell>{statusBadge(t.status)}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={changingId === t.id}
-                      onClick={() => setStatus(t.id, 'In Transit')}
-                    >
-                      In Transit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={changingId === t.id}
-                      onClick={() => setStatus(t.id, 'Delivered')}
-                    >
-                      Delivered
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      disabled={changingId === t.id}
-                      onClick={() => setStatus(t.id, 'Delayed')}
-                    >
-                      Delayed
-                    </Button>
-                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>
