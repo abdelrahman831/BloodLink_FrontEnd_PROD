@@ -5,19 +5,9 @@ import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Truck } from 'lucide-react';
 import { useAPI, useMutation } from '../hooks/useAPI';
-import { transfersAPI } from '../services/api';
+import { transfersAPI, type Transfer } from '../services/api';
 
-type Transfer = {
-  fromHospital?: string;
-  toHospital?: string;
-  bloodType?: number;
-  component?: string;
-  totalUnits?: number;
-  status: number; // In Transit | Delayed | Delivered ...
-  updatedAt?: string;
-  magazine?:boolean;
-};
-        const bloodTypeMap: Record<number, string> = {
+              const bloodTypeMap: Record<number, string> = {
         3 : 'A+', 4: 'A-', 5: 'B+', 6: 'B-',
         7: 'AB+', 8: 'AB-', 1: 'O+', 2: 'O-'
       };
@@ -102,7 +92,7 @@ export function TransfersLogistics() {
               )}
 
               {(data || []).map((t) => (
-                <TableRow key={t.id}>
+                <TableRow key={t.id} className={t.magazine ? 'bg-green-100' : 'bg-red-100'}>
                   <TableCell>{t.fromHospital || '—'}</TableCell>
                   <TableCell>{t.toHospital || '—'}</TableCell>
                   <TableCell>

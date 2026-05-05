@@ -133,7 +133,9 @@ type Campaign = {
   avgWaitMinutes?: number;
 };
 
-type Transfer = {
+
+export type Transfer = {
+  id?: string;
   fromHospital?: string;
   toHospital?: string;
   bloodType?: number;
