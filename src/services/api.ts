@@ -132,6 +132,18 @@ type Campaign = {
   eligiblePercent?: number;
   avgWaitMinutes?: number;
 };
+
+type Transfer = {
+  id: string;
+  from?: string;
+  to?: string;
+  bloodType?: string;
+  component?: string;
+  units?: number;
+  status: string; // In Transit | Delayed | Delivered ...
+  temperature?: number;
+  updatedAt?: string;
+};
 // Donations & Campaigns APIs
 export const campaignsAPI = {
 
@@ -156,7 +168,7 @@ export const campaignsAPI = {
 
 // Transfers & Logistics APIs
 export const transfersAPI = {
-  getAll: () => apiCall('/transfers'),
+  getForHospital: (id: string) => apiCall(`/Transfers/get-transfers-for-hospital/${id}`) as Promise<Transfer[]>,
   getById: (id: string) => apiCall(`/Transfers/get-transfers-for-hospital/${id}`),
   create: (data: any) => 
     apiCall('/transfers', {
