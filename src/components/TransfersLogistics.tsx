@@ -99,7 +99,7 @@ export function TransfersLogistics() {
                     {t.bloodType ? `${bloodTypeMap[t.bloodType]}${t.component ? ` • ${t.component}` : ''}` : '—'}
                   </TableCell>
                   <TableCell>{typeof t.totalUnits === 'number' ? t.totalUnits : '—'}</TableCell>
-                  <TableCell>{statusBadge(t.status)}</TableCell>
+                  <TableCell>{statusBadge(t.bloodUnitStatus)}</TableCell>
                   
                 </TableRow>
               ))}

@@ -141,7 +141,7 @@ export type Transfer = {
   bloodType?: number;
   component?: string;
   totalUnits?: number;
-  status: number; // In Transit | Delayed | Delivered ...
+  bloodUnitStatus: number; // In Transit | Delayed | Delivered ...
   updatedAt?: string;
   magazine?:boolean;
 };
